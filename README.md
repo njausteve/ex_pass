@@ -1,8 +1,12 @@
 # ExPass
 
-ExPass is a robust Elixir library designed to simplify the creation of digital passes compatible with mobile wallets
+ExPass is a robust Elixir library designed to simplify the creation of digital passes
+compatible with mobile wallet applications, such as Apple Wallet. It enables developers
+to generate and manage various types of passes, including boarding passes, coupons,
+event tickets, store cards, and generic passes, all in compliance with the latest
+pass specifications.
 
-**TODO: Add description**
+## Features
 
 ## Installation
 
