@@ -93,6 +93,16 @@ jobs:
       # Customize this step if a different behavior is desired.
       - name: Compiles without warnings
         run: mix compile --warnings-as-errors
+        
+      # Step: Check for unused dependencies
+      # This step ensures that all listed dependencies are actually used in the project
+      - name: Check unused deps
+        run: mix deps.unlock --check-unused
+
+      # Step: Run Credo for code analysis
+      # Credo is a static code analysis tool that focuses on teaching and code consistency
+      - name: Check credo (backend only)
+        run: mix credo
 
       # Step: Check that the checked in code has already been formatted.
       # This step fails if something was found unformatted.
