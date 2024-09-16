@@ -2,30 +2,60 @@ defmodule ExPass.Structs.FieldContentTest do
   @moduledoc false
 
   use ExUnit.Case
-
   alias ExPass.Structs.FieldContent
 
-  describe "field struct" do
+  doctest FieldContent
+
+  describe "FieldContent struct change_message" do
+    test "new/1 raises ArgumentError for invalid change_message without '%@' placeholder" do
+      message = "Balance updated"
+
+      assert_raise ArgumentError, ~r/Invalid change_message: "Balance updated"/, fn ->
+        FieldContent.new(%{change_message: message})
+      end
+    end
+
+    test "new/1 creates a FieldContent struct with valid change_message containing '%@' placeholder" do
+      message = "Balance updated to %@"
+      result = FieldContent.new(%{change_message: message})
+
+      assert result.change_message == message
+      assert Jason.encode!(result) == ~s({"changeMessage":"Balance updated to %@"})
+    end
+
+    test "new/1 trims whitespace from change_message while preserving '%@' placeholder" do
+      message = "  Trimmed message %@  "
+      result = FieldContent.new(%{change_message: message})
+
+      assert result.change_message == "Trimmed message %@"
+      assert Jason.encode!(result) == ~s({"changeMessage":"Trimmed message %@"})
+    end
+  end
+
+  describe "FieldContent struct attributed_value" do
     test "new/1 creates an empty FieldContent struct when no attributes are provided" do
       assert %FieldContent{attributed_value: nil} = FieldContent.new()
+      assert Jason.encode!(FieldContent.new()) == ~s({})
     end
 
     test "new/1 creates a valid FieldContent struct with string" do
       input_string = "Hello, World!"
       result = FieldContent.new(%{attributed_value: input_string})
 
-      assert result.attributed_value == input_string
+      assert %FieldContent{attributed_value: ^input_string} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":"Hello, World!"})
     end
 
     test "new/1 creates a valid FieldContent struct with number" do
       input_number = 42
       result = FieldContent.new(%{attributed_value: input_number})
 
-      assert result.attributed_value == input_number
+      assert %FieldContent{attributed_value: ^input_number} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":42})
     end
 
     test "new/1 raises ArgumentError for invalid attributed_value types" do
-      invalid_values = [%{}, [1, 2, 3], self(), :stephen]
+      invalid_values = [%{}, [1, 2, 3], self(), :atom]
 
       for invalid_value <- invalid_values do
         assert_raise ArgumentError, ~r/Invalid attributed_value:/, fn ->
@@ -38,14 +68,16 @@ defmodule ExPass.Structs.FieldContentTest do
       input_time = DateTime.utc_now()
       result = FieldContent.new(%{attributed_value: input_time})
 
-      assert result.attributed_value == input_time
+      assert %FieldContent{attributed_value: ^input_time} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":"#{DateTime.to_iso8601(input_time)}"})
     end
 
     test "new/1 creates a valid FieldContent struct with Date" do
       input_date = Date.utc_today()
       result = FieldContent.new(%{attributed_value: input_date})
 
-      assert result.attributed_value == input_date
+      assert %FieldContent{attributed_value: ^input_date} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":"#{Date.to_iso8601(input_date)}"})
     end
 
     test "new/1 raises ArgumentError for attributed_value with unsupported HTML tag" do
@@ -55,62 +87,15 @@ defmodule ExPass.Structs.FieldContentTest do
         FieldContent.new(%{attributed_value: input_value})
       end
     end
-  end
 
-  describe "JSON encoding" do
-    test "encodes FieldContent with string attributed_value" do
-      json =
-        %{attributed_value: "Hello, World!"}
-        |> FieldContent.new()
-        |> Jason.encode!()
+    test "new/1 creates a valid FieldContent struct with supported HTML tag" do
+      input_value = "<a href='http://example.com'>Link</a>"
+      result = FieldContent.new(%{attributed_value: input_value})
 
-      assert json == ~s({"attributedValue":"Hello, World!"})
-    end
+      assert %FieldContent{attributed_value: ^input_value} = result
 
-    test "encodes FieldContent with number attributed_value" do
-      json =
-        %{attributed_value: 42}
-        |> FieldContent.new()
-        |> Jason.encode!()
-
-      assert json == ~s({"attributedValue":42})
-    end
-
-    test "encodes FieldContent with DateTime attributed_value" do
-      datetime = DateTime.from_naive!(~N[2023-01-01 12:00:00], "Etc/UTC")
-
-      json =
-        %{attributed_value: datetime}
-        |> FieldContent.new()
-        |> Jason.encode!()
-
-      assert json == ~s({"attributedValue":"2023-01-01T12:00:00Z"})
-    end
-
-    test "encodes FieldContent with Date attributed_value" do
-      json =
-        %{attributed_value: ~D[2023-01-01]}
-        |> FieldContent.new()
-        |> Jason.encode!()
-
-      assert json == ~s({"attributedValue":"2023-01-01"})
-    end
-
-    test "FieldContent with nil attributed_value are excluded from the final encoded json" do
-      json =
-        FieldContent.new()
-        |> Jason.encode!()
-
-      assert json == ~s({})
-    end
-
-    test "encodes FieldContent with HTML attributed_value" do
-      json =
-        %{attributed_value: "<a href='http://example.com'>Link</a>"}
-        |> FieldContent.new()
-        |> Jason.encode!()
-
-      assert json == ~s({"attributedValue":"<a href='http://example.com'>Link</a>"})
+      assert Jason.encode!(result) ==
+               ~s({"attributedValue":"<a href='http://example.com'>Link</a>"})
     end
   end
 end
