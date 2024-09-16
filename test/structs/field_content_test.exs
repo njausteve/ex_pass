@@ -56,4 +56,61 @@ defmodule ExPass.Structs.FieldContentTest do
       end
     end
   end
+
+  describe "JSON encoding" do
+    test "encodes FieldContent with string attributed_value" do
+      json =
+        %{attributed_value: "Hello, World!"}
+        |> FieldContent.new()
+        |> Jason.encode!()
+
+      assert json == ~s({"attributedValue":"Hello, World!"})
+    end
+
+    test "encodes FieldContent with number attributed_value" do
+      json =
+        %{attributed_value: 42}
+        |> FieldContent.new()
+        |> Jason.encode!()
+
+      assert json == ~s({"attributedValue":42})
+    end
+
+    test "encodes FieldContent with DateTime attributed_value" do
+      datetime = DateTime.from_naive!(~N[2023-01-01 12:00:00], "Etc/UTC")
+
+      json =
+        %{attributed_value: datetime}
+        |> FieldContent.new()
+        |> Jason.encode!()
+
+      assert json == ~s({"attributedValue":"2023-01-01T12:00:00Z"})
+    end
+
+    test "encodes FieldContent with Date attributed_value" do
+      json =
+        %{attributed_value: ~D[2023-01-01]}
+        |> FieldContent.new()
+        |> Jason.encode!()
+
+      assert json == ~s({"attributedValue":"2023-01-01"})
+    end
+
+    test "FieldContent with nil attributed_value are excluded from the final encoded json" do
+      json =
+        FieldContent.new()
+        |> Jason.encode!()
+
+      assert json == ~s({})
+    end
+
+    test "encodes FieldContent with HTML attributed_value" do
+      json =
+        %{attributed_value: "<a href='http://example.com'>Link</a>"}
+        |> FieldContent.new()
+        |> Jason.encode!()
+
+      assert json == ~s({"attributedValue":"<a href='http://example.com'>Link</a>"})
+    end
+  end
 end

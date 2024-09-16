@@ -23,6 +23,8 @@ defmodule ExPass.Structs.FieldContent do
   """
 
   use TypedStruct
+
+  alias ExPass.Utils.Converter
   alias ExPass.Utils.Validators
 
   @typedoc """
@@ -115,6 +117,17 @@ defmodule ExPass.Structs.FieldContent do
         Reason: #{reason}
         Supported types are: String (including <a></a> tag), number, DateTime and Date
         """
+    end
+  end
+
+  defimpl Jason.Encoder do
+    def encode(field_content, opts) do
+      field_content
+      |> Map.from_struct()
+      |> Enum.filter(fn {_, v} -> v != nil end)
+      |> Enum.map(fn {k, v} -> {Converter.camelize_key(k), v} end)
+      |> Enum.into(%{})
+      |> Jason.Encode.map(opts)
     end
   end
 end
