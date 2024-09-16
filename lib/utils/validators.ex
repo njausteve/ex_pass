@@ -68,6 +68,44 @@ defmodule ExPass.Utils.Validators do
 
   def validate_attributed_value(_), do: {:error, "invalid attributed_value type"}
 
+  @doc """
+  Validates the change_message field.
+
+  The change_message must be a string containing the '%@' placeholder for the new value.
+
+  ## Returns
+
+    * `:ok` if the value is a valid change_message string.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_change_message("Gate changed to %@")
+      :ok
+
+      iex> validate_change_message("Invalid message without placeholder")
+      {:error, "change_message must contain '%@' placeholder"}
+
+      iex> validate_change_message(nil)
+      :ok
+
+      iex> validate_change_message(42)
+      {:error, "change_message must be a string"}
+
+  """
+  @spec validate_change_message(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_change_message(nil), do: :ok
+
+  def validate_change_message(value) when is_binary(value) do
+    if String.contains?(value, "%@") do
+      :ok
+    else
+      {:error, "change_message must contain '%@' placeholder"}
+    end
+  end
+
+  def validate_change_message(_), do: {:error, "change_message must be a string"}
+
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
     string_without_anchors = String.replace(string, ~r{<a\s[^>]*>.*?</a>|<a\s[^>]*/>}, "")

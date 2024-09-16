@@ -5,6 +5,36 @@ defmodule ExPass.Utils.Converter do
   """
 
   @doc """
+  Trims whitespace from string values in a map while preserving non-string values.
+
+  This function iterates through the key-value pairs of the input map. For each pair,
+  if the value is a string, it trims leading and trailing whitespace. Non-string
+  values are left unchanged.
+
+  ## Parameters
+
+    * `attrs` - A map containing key-value pairs to be processed.
+
+  ## Returns
+
+    * A new map with the same keys as the input, but with string values trimmed.
+
+  ## Examples
+
+      iex> attrs = %{name: "  John Doe  ", age: 30, email: " john@example.com "}
+      iex> ExPass.Utils.Converter.trim_string_values(attrs)
+      %{name: "John Doe", age: 30, email: "john@example.com"}
+
+  """
+  @spec trim_string_values(map()) :: map()
+  def trim_string_values(attrs) do
+    Map.new(attrs, fn {key, value} ->
+      trimmed_value = if is_binary(value), do: String.trim(value), else: value
+      {key, trimmed_value}
+    end)
+  end
+
+  @doc """
   Converts a key (atom or string) to camelCase format.
 
   ## Examples
