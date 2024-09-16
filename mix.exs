@@ -24,7 +24,8 @@ defmodule ExPass.MixProject do
     [
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:typed_struct, "~> 0.1.4"}
     ]
   end
 end
