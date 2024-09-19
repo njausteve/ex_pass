@@ -13,6 +13,8 @@ defmodule ExPass.Structs.FieldContent do
     formatting or interactivity. It can be a string, number, or ISO 8601 date string.
   - `change_message`: A message that describes the change to the field's value.
      It should include the '%@' placeholder for the new value.
+  - `currency_code`: The ISO 4217 currency code for the field's value, if applicable.
+     This is used when the field represents a monetary amount.
   """
 
   use TypedStruct
@@ -50,6 +52,7 @@ defmodule ExPass.Structs.FieldContent do
   typedstruct do
     field :attributed_value, attributed_value(), default: nil
     field :change_message, String.t(), default: nil
+    field :currency_code, String.t(), default: nil
   end
 
   @doc """
@@ -100,6 +103,7 @@ defmodule ExPass.Structs.FieldContent do
       |> Converter.trim_string_values()
       |> validate(:attributed_value, &Validators.validate_attributed_value/1)
       |> validate(:change_message, &Validators.validate_change_message/1)
+      |> validate(:currency_code, &Validators.validate_currency_code/1)
 
     struct!(__MODULE__, attrs)
   end

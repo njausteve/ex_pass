@@ -98,4 +98,52 @@ defmodule ExPass.Structs.FieldContentTest do
                ~s({"attributedValue":"<a href='http://example.com'>Link</a>"})
     end
   end
+
+  describe "currency_code" do
+    test "new/1 creates a valid FieldContent struct with valid currency_code as string" do
+      input = %{attributed_value: 100, currency_code: "USD"}
+      result = FieldContent.new(input)
+
+      assert %FieldContent{attributed_value: 100, currency_code: "USD"} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":100,"currencyCode":"USD"})
+    end
+
+    test "new/1 creates a valid FieldContent struct with valid currency_code as atom" do
+      input = %{attributed_value: 100, currency_code: :USD}
+      result = FieldContent.new(input)
+
+      assert %FieldContent{attributed_value: 100, currency_code: :USD} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":100,"currencyCode":"USD"})
+    end
+
+    test "new/1 raises ArgumentError for invalid currency_code" do
+      assert_raise ArgumentError, ~r/Invalid currency code INVALID/, fn ->
+        FieldContent.new(%{attributed_value: 100, currency_code: "INVALID"})
+      end
+
+      assert_raise ArgumentError, ~r/Invalid currency code INVALID/, fn ->
+        FieldContent.new(%{attributed_value: 100, currency_code: :INVALID})
+      end
+    end
+
+    test "new/1 allows nil currency_code" do
+      result = FieldContent.new(%{attributed_value: 100})
+
+      assert %FieldContent{attributed_value: 100, currency_code: nil} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":100})
+    end
+
+    test "new/1 raises ArgumentError when currency_code is not a string or atom" do
+      assert_raise ArgumentError, ~r/Currency code must be a string or atom/, fn ->
+        FieldContent.new(%{attributed_value: 100, currency_code: 123})
+      end
+    end
+
+    test "new/1 trims whitespace from currency_code string" do
+      result = FieldContent.new(%{currency_code: "  USD  "})
+
+      assert %FieldContent{attributed_value: nil, currency_code: "USD"} = result
+      assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
+    end
+  end
 end

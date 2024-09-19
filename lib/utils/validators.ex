@@ -9,6 +9,8 @@ defmodule ExPass.Utils.Validators do
   These validators are primarily used internally by other ExPass modules.
   """
 
+  @currency_code_regex ~r/^(AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BOV|BRL|BSD|BTN|BWP|BYN|BZD|CAD|CDF|CHE|CHF|CHW|CLF|CLP|CNY|COP|COU|CRC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRU|MUR|MVR|MWK|MXN|MXV|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SOS|SRD|SSP|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|USN|UYI|UYU|UYW|UZS|VED|VES|VND|VUV|WST|XAF|XAG|XAU|XBA|XBB|XBC|XBD|XCD|XDR|XOF|XPD|XPF|XPT|XSU|XTS|XUA|XXX|YER|ZAR|ZMW|ZWG|ZWL)$/
+
   @doc """
   Validates the type of the attributed value.
 
@@ -105,6 +107,49 @@ defmodule ExPass.Utils.Validators do
   end
 
   def validate_change_message(_), do: {:error, "change_message must be a string"}
+
+  @doc """
+  Validates the currency_code field.
+
+  The currency_code must be a valid ISO 4217 currency code string or atom.
+
+  ## Returns
+
+    * `:ok` if the value is a valid ISO 4217 currency code string or atom.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_currency_code("USD")
+      :ok
+
+      iex> validate_currency_code(:EUR)
+      :ok
+
+      iex> validate_currency_code("INVALID")
+      {:error, "Invalid currency code"}
+
+      iex> validate_currency_code(nil)
+      :ok
+
+      iex> validate_currency_code(123)
+      {:error, "Currency code must be a string or atom"}
+
+  """
+  @spec validate_currency_code(String.t() | atom() | nil) :: :ok | {:error, String.t()}
+  def validate_currency_code(nil), do: :ok
+
+  def validate_currency_code(value) when is_binary(value) or is_atom(value) do
+    value_string = if is_atom(value), do: Atom.to_string(value), else: value
+
+    if Regex.match?(@currency_code_regex, value_string) do
+      :ok
+    else
+      {:error, "Invalid currency code #{value_string}"}
+    end
+  end
+
+  def validate_currency_code(_), do: {:error, "Currency code must be a string or atom"}
 
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
