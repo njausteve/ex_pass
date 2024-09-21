@@ -11,10 +11,21 @@ defmodule ExPass.Structs.FieldContent do
 
   - `attributed_value`: The field's value, which can include HTML markup for enhanced
     formatting or interactivity. It can be a string, number, or ISO 8601 date string.
+
   - `change_message`: A message that describes the change to the field's value.
      It should include the '%@' placeholder for the new value.
+
   - `currency_code`: The ISO 4217 currency code for the field's value, if applicable.
      This is used when the field represents a monetary amount.
+
+  - `data_detector_types`: A list of data detectors to apply to the field's value.
+     These detectors can automatically convert certain types of data into tappable links.
+
+     Supported values are:
+     * "PKDataDetectorTypePhoneNumber" - Detects phone numbers
+     * "PKDataDetectorTypeLink" - Detects URLs and web links
+     * "PKDataDetectorTypeAddress" - Detects physical addresses
+     * "PKDataDetectorTypeCalendarEvent" - Detects calendar events
   """
 
   use TypedStruct
@@ -49,18 +60,31 @@ defmodule ExPass.Structs.FieldContent do
   """
   @type attributed_value() :: String.t() | number() | DateTime.t() | Date.t()
 
+  @typedoc """
+  The list of data detector types to apply to the field's value.
+
+  Optional. Valid values are:
+  - "PKDataDetectorTypePhoneNumber"
+  - "PKDataDetectorTypeLink"
+  - "PKDataDetectorTypeAddress"
+  - "PKDataDetectorTypeCalendarEvent"
+
+  These detectors can automatically convert certain types of data into tappable links.
+  """
+  @type data_detector_types() :: list(String.t())
+
   typedstruct do
     field :attributed_value, attributed_value(), default: nil
     field :change_message, String.t(), default: nil
     field :currency_code, String.t(), default: nil
+    field :data_detector_types, data_detector_types(), default: nil
   end
 
   @doc """
   Creates a new FieldContent struct.
 
   This function initializes a new FieldContent struct with the given attributes.
-  It validates both the `attributed_value` using the `ExPass.Utils.Validators.validate_attributed_value/1` function
-  and the `change_message` using the `ExPass.Utils.Validators.validate_change_message/1` function.
+  It validates the `attributed_value`, `change_message`, `currency_code`, and `data_detector_types`.
 
   ## Parameters
 
@@ -72,29 +96,24 @@ defmodule ExPass.Structs.FieldContent do
 
   ## Raises
 
-    * `ArgumentError` if the `attributed_value` is invalid. The error message will include details about the invalid value and supported types.
-    * `ArgumentError` if the `change_message` is invalid. The error message will include details about the invalid value and the required format.
+    * `ArgumentError` if any of the attributes are invalid. The error message will include details about the invalid value and supported types.
 
   ## Examples
 
       iex> FieldContent.new(%{attributed_value: "Hello, World!"})
-      %FieldContent{attributed_value: "Hello, World!", change_message: nil}
+      %FieldContent{attributed_value: "Hello, World!", change_message: nil, currency_code: nil, data_detector_types: nil}
 
-      iex> FieldContent.new(%{attributed_value: 42})
-      %FieldContent{attributed_value: 42, change_message: nil}
+      iex> FieldContent.new(%{attributed_value: 42, data_detector_types: ["PKDataDetectorTypePhoneNumber"]})
+      %FieldContent{attributed_value: 42, change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypePhoneNumber"]}
 
       iex> datetime = DateTime.utc_now()
-      iex> field_content = FieldContent.new(%{attributed_value: datetime})
-      iex> %FieldContent{attributed_value: ^datetime} = field_content
+      iex> field_content = FieldContent.new(%{attributed_value: datetime, currency_code: "USD"})
+      iex> %FieldContent{attributed_value: ^datetime, currency_code: "USD"} = field_content
       iex> field_content.change_message
       nil
 
-      iex> date = Date.utc_today()
-      iex> FieldContent.new(%{attributed_value: date})
-      %FieldContent{attributed_value: date, change_message: nil}
-
-      iex> FieldContent.new(%{attributed_value: "<a href='http://example.com'>Click here</a>"})
-      %FieldContent{attributed_value: "<a href='http://example.com'>Click here</a>", change_message: nil}
+      iex> FieldContent.new(%{attributed_value: "<a href='http://example.com'>Click here</a>", data_detector_types: ["PKDataDetectorTypeLink"]})
+      %FieldContent{attributed_value: "<a href='http://example.com'>Click here</a>", change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypeLink"]}
   """
   @spec new(map()) :: %__MODULE__{}
   def new(attrs \\ %{}) do
@@ -104,6 +123,7 @@ defmodule ExPass.Structs.FieldContent do
       |> validate(:attributed_value, &Validators.validate_attributed_value/1)
       |> validate(:change_message, &Validators.validate_change_message/1)
       |> validate(:currency_code, &Validators.validate_currency_code/1)
+      |> validate(:data_detector_types, &Validators.validate_data_detector_types/1)
 
     struct!(__MODULE__, attrs)
   end
@@ -127,6 +147,13 @@ defmodule ExPass.Structs.FieldContent do
             Invalid change_message: #{inspect(attrs[key])}
             Reason: #{reason}
             The change_message must be a string containing the '%@' placeholder for the new value.
+            """
+
+          key == :data_detector_types ->
+            raise ArgumentError, """
+            Invalid data_detector_types: #{inspect(attrs[key])}
+            Reason: #{reason}
+            data_detector_types must be a list of valid detector type strings.
             """
 
           true ->
