@@ -204,4 +204,55 @@ defmodule ExPass.Structs.FieldContentTest do
       end
     end
   end
+
+  describe "dateStyle" do
+    test "new/1 creates a valid FieldContent struct with dateStyle" do
+      input = %{attributed_value: "2023-05-01", date_style: "PKDateStyleShort"}
+      result = FieldContent.new(input)
+
+      assert %FieldContent{attributed_value: "2023-05-01", date_style: "PKDateStyleShort"} =
+               result
+
+      assert Jason.encode!(result) ==
+               ~s({"attributedValue":"2023-05-01","dateStyle":"PKDateStyleShort"})
+    end
+
+    test "new/1 allows all valid dateStyle values" do
+      valid_styles = [
+        "PKDateStyleNone",
+        "PKDateStyleShort",
+        "PKDateStyleMedium",
+        "PKDateStyleLong",
+        "PKDateStyleFull"
+      ]
+
+      for style <- valid_styles do
+        result = FieldContent.new(%{attributed_value: "2023-05-01", date_style: style})
+        assert %FieldContent{date_style: ^style} = result
+      end
+    end
+
+    test "new/1 raises ArgumentError for invalid dateStyle" do
+      assert_raise ArgumentError,
+                   ~r/Invalid date_style: InvalidStyle. Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull/,
+                   fn ->
+                     FieldContent.new(%{
+                       attributed_value: "2023-05-01",
+                       date_style: "InvalidStyle"
+                     })
+                   end
+    end
+
+    test "new/1 allows nil dateStyle" do
+      result = FieldContent.new(%{attributed_value: "2023-05-01"})
+      assert %FieldContent{attributed_value: "2023-05-01", date_style: nil} = result
+      assert Jason.encode!(result) == ~s({"attributedValue":"2023-05-01"})
+    end
+
+    test "new/1 raises ArgumentError when dateStyle is not a string" do
+      assert_raise ArgumentError, ~r/date_style must be a string/, fn ->
+        FieldContent.new(%{attributed_value: "2023-05-01", date_style: :PKDateStyleShort})
+      end
+    end
+  end
 end

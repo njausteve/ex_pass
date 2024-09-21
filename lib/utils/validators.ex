@@ -18,6 +18,14 @@ defmodule ExPass.Utils.Validators do
     "PKDataDetectorTypeCalendarEvent"
   ]
 
+  @valid_date_styles [
+    "PKDateStyleNone",
+    "PKDateStyleShort",
+    "PKDateStyleMedium",
+    "PKDateStyleLong",
+    "PKDateStyleFull"
+  ]
+
   @doc """
   Validates the type of the attributed value.
 
@@ -202,6 +210,45 @@ defmodule ExPass.Utils.Validators do
   end
 
   def validate_data_detector_types(_), do: {:error, "data_detector_types must be a list"}
+
+  @doc """
+  Validates the date_style field.
+
+  The date_style must be a valid date style string.
+
+  ## Returns
+
+    * `:ok` if the value is a valid date style string or nil.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_date_style("PKDateStyleShort")
+      :ok
+
+      iex> validate_date_style(nil)
+      :ok
+
+      iex> validate_date_style("InvalidStyle")
+      {:error, "Invalid date_style: InvalidStyle. Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull"}
+
+      iex> validate_date_style(42)
+      {:error, "date_style must be a string"}
+
+  """
+  @spec validate_date_style(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_date_style(nil), do: :ok
+
+  def validate_date_style(style) when is_binary(style) do
+    if style in @valid_date_styles do
+      :ok
+    else
+      {:error,
+       "Invalid date_style: #{style}. Supported values are: #{Enum.join(@valid_date_styles, ", ")}"}
+    end
+  end
+
+  def validate_date_style(_), do: {:error, "date_style must be a string"}
 
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
