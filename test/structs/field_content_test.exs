@@ -249,4 +249,33 @@ defmodule ExPass.Structs.FieldContentTest do
       end
     end
   end
+
+  describe "is_relative" do
+    test "new/1 creates a valid FieldContent struct with is_relative set to true" do
+      result = FieldContent.new(%{is_relative: true})
+
+      assert %FieldContent{is_relative: true} = result
+      assert Jason.encode!(result) == ~s({"isRelative":true})
+    end
+
+    test "new/1 creates a valid FieldContent struct with is_relative set to false" do
+      result = FieldContent.new(%{is_relative: false})
+
+      assert %FieldContent{is_relative: false} = result
+      assert Jason.encode!(result) == ~s({"isRelative":false})
+    end
+
+    test "new/1 defaults to nil when is_relative is not provided" do
+      result = FieldContent.new(%{})
+
+      assert %FieldContent{is_relative: nil} = result
+      assert Jason.encode!(result) == ~s({})
+    end
+
+    test "new/1 raises ArgumentError when is_relative is not a boolean" do
+      assert_raise ArgumentError, ~r/is_relative must be a boolean/, fn ->
+        FieldContent.new(%{is_relative: "true"})
+      end
+    end
+  end
 end
