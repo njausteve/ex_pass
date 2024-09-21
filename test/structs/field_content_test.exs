@@ -236,10 +236,10 @@ defmodule ExPass.Structs.FieldContentTest do
       assert Jason.encode!(result) == ~s({"ignoresTimeZone":false})
     end
 
-    test "new/1 defaults to false when ignores_time_zone is not provided" do
+    test "new/1 defaults to nil when ignores_time_zone is not provided" do
       result = FieldContent.new(%{})
 
-      assert %FieldContent{ignores_time_zone: false} = result
+      assert %FieldContent{ignores_time_zone: nil} = result
       assert Jason.encode!(result) == ~s({})
     end
 
