@@ -20,6 +20,7 @@ defmodule ExPass.Structs.FieldContent do
 
   - `data_detector_types`: A list of data detectors to apply to the field's value.
      These detectors can automatically convert certain types of data into tappable links.
+     By default, all data detectors are applied. To use no data detectors, specify an empty list.
 
      Supported values are:
      * "PKDataDetectorTypePhoneNumber" - Detects phone numbers
@@ -78,8 +79,9 @@ defmodule ExPass.Structs.FieldContent do
   - "PKDataDetectorTypeCalendarEvent"
 
   These detectors can automatically convert certain types of data into tappable links.
+  By default, all data detectors are applied. To use no data detectors, specify an empty list.
   """
-  @type data_detector_types() :: list(String.t())
+  @type data_detector_types() :: list(String.t()) | []
 
   @typedoc """
   The style of the date to display in the field.
@@ -135,6 +137,9 @@ defmodule ExPass.Structs.FieldContent do
 
       iex> FieldContent.new(%{attributed_value: "<a href='http://example.com'>Click here</a>", data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull"})
       %FieldContent{attributed_value: "<a href='http://example.com'>Click here</a>", change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull"}
+
+      iex> FieldContent.new(%{attributed_value: "No detectors", data_detector_types: []})
+      %FieldContent{attributed_value: "No detectors", change_message: nil, currency_code: nil, data_detector_types: [], date_style: nil}
   """
   @spec new(map()) :: %__MODULE__{}
   def new(attrs \\ %{}) do
@@ -176,7 +181,7 @@ defmodule ExPass.Structs.FieldContent do
           "The change_message must be a string containing the '%@' placeholder for the new value."
 
         :data_detector_types ->
-          "data_detector_types must be a list of valid detector type strings."
+          "data_detector_types must be a list of valid detector type strings. Use an empty list to disable all detectors."
 
         :date_style ->
           "Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull"
