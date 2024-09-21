@@ -220,4 +220,33 @@ defmodule ExPass.Structs.FieldContentTest do
       end
     end
   end
+
+  describe "ignores_time_zone" do
+    test "new/1 creates a valid FieldContent struct with ignores_time_zone set to true" do
+      result = FieldContent.new(%{ignores_time_zone: true})
+
+      assert %FieldContent{ignores_time_zone: true} = result
+      assert Jason.encode!(result) == ~s({"ignoresTimeZone":true})
+    end
+
+    test "new/1 creates a valid FieldContent struct with ignores_time_zone set to false" do
+      result = FieldContent.new(%{ignores_time_zone: false})
+
+      assert %FieldContent{ignores_time_zone: false} = result
+      assert Jason.encode!(result) == ~s({"ignoresTimeZone":false})
+    end
+
+    test "new/1 defaults to false when ignores_time_zone is not provided" do
+      result = FieldContent.new(%{})
+
+      assert %FieldContent{ignores_time_zone: false} = result
+      assert Jason.encode!(result) == ~s({})
+    end
+
+    test "new/1 raises ArgumentError when ignores_time_zone is not a boolean" do
+      assert_raise ArgumentError, ~r/ignores_time_zone must be a boolean/, fn ->
+        FieldContent.new(%{ignores_time_zone: "true"})
+      end
+    end
+  end
 end
