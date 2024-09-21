@@ -6,7 +6,7 @@ defmodule ExPass.Structs.FieldContentTest do
 
   doctest FieldContent
 
-  describe "FieldContent struct change_message" do
+  describe "change_message" do
     test "new/1 raises ArgumentError for invalid change_message without '%@' placeholder" do
       message = "Balance updated"
 
@@ -32,7 +32,7 @@ defmodule ExPass.Structs.FieldContentTest do
     end
   end
 
-  describe "FieldContent struct attributed_value" do
+  describe "attributed_value" do
     test "new/1 creates an empty FieldContent struct when no attributes are provided" do
       assert %FieldContent{attributed_value: nil} = FieldContent.new()
       assert Jason.encode!(FieldContent.new()) == ~s({})
@@ -101,87 +101,64 @@ defmodule ExPass.Structs.FieldContentTest do
 
   describe "currency_code" do
     test "new/1 creates a valid FieldContent struct with valid currency_code as string" do
-      input = %{attributed_value: 100, currency_code: "USD"}
-      result = FieldContent.new(input)
+      result = FieldContent.new(%{currency_code: "USD"})
 
-      assert %FieldContent{attributed_value: 100, currency_code: "USD"} = result
-      assert Jason.encode!(result) == ~s({"attributedValue":100,"currencyCode":"USD"})
+      assert %FieldContent{currency_code: "USD"} = result
+      assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
     end
 
     test "new/1 creates a valid FieldContent struct with valid currency_code as atom" do
-      input = %{attributed_value: 100, currency_code: :USD}
-      result = FieldContent.new(input)
+      result = FieldContent.new(%{currency_code: :USD})
 
-      assert %FieldContent{attributed_value: 100, currency_code: :USD} = result
-      assert Jason.encode!(result) == ~s({"attributedValue":100,"currencyCode":"USD"})
+      assert %FieldContent{currency_code: :USD} = result
+      assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
     end
 
     test "new/1 raises ArgumentError for invalid currency_code" do
       assert_raise ArgumentError, ~r/Invalid currency code INVALID/, fn ->
-        FieldContent.new(%{attributed_value: 100, currency_code: "INVALID"})
+        FieldContent.new(%{currency_code: "INVALID"})
       end
 
       assert_raise ArgumentError, ~r/Invalid currency code INVALID/, fn ->
-        FieldContent.new(%{attributed_value: 100, currency_code: :INVALID})
+        FieldContent.new(%{currency_code: :INVALID})
       end
-    end
-
-    test "new/1 allows nil currency_code" do
-      result = FieldContent.new(%{attributed_value: 100})
-
-      assert %FieldContent{attributed_value: 100, currency_code: nil} = result
-      assert Jason.encode!(result) == ~s({"attributedValue":100})
     end
 
     test "new/1 raises ArgumentError when currency_code is not a string or atom" do
       assert_raise ArgumentError, ~r/Currency code must be a string or atom/, fn ->
-        FieldContent.new(%{attributed_value: 100, currency_code: 123})
+        FieldContent.new(%{currency_code: 123})
       end
     end
 
     test "new/1 trims whitespace from currency_code string" do
       result = FieldContent.new(%{currency_code: "  USD  "})
 
-      assert %FieldContent{attributed_value: nil, currency_code: "USD"} = result
+      assert %FieldContent{currency_code: "USD"} = result
       assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
     end
   end
 
   describe "data_detector_types" do
     test "new/1 creates a valid FieldContent struct with valid data_detector_types" do
-      input = %{
-        attributed_value: "Contact us at info@example.com",
-        data_detector_types: ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"]
-      }
-
-      result = FieldContent.new(input)
+      result =
+        FieldContent.new(%{
+          data_detector_types: ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"]
+        })
 
       assert %FieldContent{
-               attributed_value: "Contact us at info@example.com",
                data_detector_types: ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"]
              } = result
 
       assert Jason.encode!(result) ==
-               ~s({"attributedValue":"Contact us at info@example.com","dataDetectorTypes":["PKDataDetectorTypePhoneNumber","PKDataDetectorTypeLink"]})
+               ~s({"dataDetectorTypes":["PKDataDetectorTypePhoneNumber","PKDataDetectorTypeLink"]})
     end
 
     test "new/1 creates a valid FieldContent struct with empty data_detector_types" do
-      input = %{attributed_value: "No detectors", data_detector_types: []}
-      result = FieldContent.new(input)
+      result = FieldContent.new(%{data_detector_types: []})
 
-      assert %FieldContent{attributed_value: "No detectors", data_detector_types: []} = result
+      assert %FieldContent{data_detector_types: []} = result
 
-      assert Jason.encode!(result) ==
-               ~s({"attributedValue":"No detectors","dataDetectorTypes":[]})
-    end
-
-    test "new/1 allows nil data_detector_types" do
-      result = FieldContent.new(%{attributed_value: "Default detectors"})
-
-      assert %FieldContent{attributed_value: "Default detectors", data_detector_types: nil} =
-               result
-
-      assert Jason.encode!(result) == ~s({"attributedValue":"Default detectors"})
+      assert Jason.encode!(result) == ~s({"dataDetectorTypes":[]})
     end
 
     test "new/1 raises ArgumentError for invalid data_detector_types" do
@@ -189,7 +166,6 @@ defmodule ExPass.Structs.FieldContentTest do
                    ~r/Invalid data detector type: InvalidDetector. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent/,
                    fn ->
                      FieldContent.new(%{
-                       attributed_value: "Invalid",
                        data_detector_types: ["InvalidDetector"]
                      })
                    end
@@ -198,9 +174,49 @@ defmodule ExPass.Structs.FieldContentTest do
     test "new/1 raises ArgumentError when data_detector_types is not a list" do
       assert_raise ArgumentError, ~r/data_detector_types must be a list/, fn ->
         FieldContent.new(%{
-          attributed_value: "Invalid",
           data_detector_types: "PKDataDetectorTypePhoneNumber"
         })
+      end
+    end
+  end
+
+  describe "date_style" do
+    test "new/1 creates a valid FieldContent struct with date_style" do
+      result = FieldContent.new(%{date_style: "PKDateStyleShort"})
+
+      assert %FieldContent{date_style: "PKDateStyleShort"} = result
+
+      assert Jason.encode!(result) == ~s({"dateStyle":"PKDateStyleShort"})
+    end
+
+    test "new/1 allows all valid date_style values" do
+      valid_styles = [
+        "PKDateStyleNone",
+        "PKDateStyleShort",
+        "PKDateStyleMedium",
+        "PKDateStyleLong",
+        "PKDateStyleFull"
+      ]
+
+      for style <- valid_styles do
+        result = FieldContent.new(%{date_style: style})
+        assert %FieldContent{date_style: ^style} = result
+      end
+    end
+
+    test "new/1 raises ArgumentError for invalid date_style" do
+      assert_raise ArgumentError,
+                   ~r/Invalid date_style: InvalidStyle. Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull/,
+                   fn ->
+                     FieldContent.new(%{
+                       date_style: "InvalidStyle"
+                     })
+                   end
+    end
+
+    test "new/1 raises ArgumentError when date_style is not a string" do
+      assert_raise ArgumentError, ~r/date_style must be a string/, fn ->
+        FieldContent.new(%{date_style: :PKDateStyleShort})
       end
     end
   end
