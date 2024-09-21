@@ -251,9 +251,14 @@ defmodule ExPass.Utils.Validators do
   def validate_date_style(_), do: {:error, "date_style must be a string"}
 
   @doc """
-  Validates the ignores_time_zone field.
+  Validates a boolean field.
 
-  The ignores_time_zone must be a boolean value.
+  The field must be a boolean value or nil.
+
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `field_name` - The name of the field being validated as an atom.
 
   ## Returns
 
@@ -262,23 +267,23 @@ defmodule ExPass.Utils.Validators do
 
   ## Examples
 
-      iex> validate_ignores_timezone(true)
+      iex> validate_boolean_field(true, :ignores_time_zone)
       :ok
 
-      iex> validate_ignores_timezone(false)
+      iex> validate_boolean_field(false, :is_relative)
       :ok
 
-      iex> validate_ignores_timezone(nil)
+      iex> validate_boolean_field(nil, :ignores_time_zone)
       :ok
 
-      iex> validate_ignores_timezone("true")
-      {:error, "ignores_time_zone must be a boolean"}
+      iex> validate_boolean_field("true", :is_relative)
+      {:error, "is_relative must be a boolean"}
 
   """
-  @spec validate_ignores_timezone(boolean() | nil) :: :ok | {:error, String.t()}
-  def validate_ignores_timezone(nil), do: :ok
-  def validate_ignores_timezone(value) when is_boolean(value), do: :ok
-  def validate_ignores_timezone(_), do: {:error, "ignores_time_zone must be a boolean"}
+  @spec validate_boolean_field(boolean() | nil, atom()) :: :ok | {:error, String.t()}
+  def validate_boolean_field(nil, _field_name), do: :ok
+  def validate_boolean_field(value, _field_name) when is_boolean(value), do: :ok
+  def validate_boolean_field(_, field_name), do: {:error, "#{field_name} must be a boolean"}
 
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
