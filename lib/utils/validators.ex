@@ -11,6 +11,13 @@ defmodule ExPass.Utils.Validators do
 
   @currency_code_regex ~r/^(AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BOV|BRL|BSD|BTN|BWP|BYN|BZD|CAD|CDF|CHE|CHF|CHW|CLF|CLP|CNY|COP|COU|CRC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRU|MUR|MVR|MWK|MXN|MXV|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SOS|SRD|SSP|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|USN|UYI|UYU|UYW|UZS|VED|VES|VND|VUV|WST|XAF|XAG|XAU|XBA|XBB|XBC|XBD|XCD|XDR|XOF|XPD|XPF|XPT|XSU|XTS|XUA|XXX|YER|ZAR|ZMW|ZWG|ZWL)$/
 
+  @valid_detector_types [
+    "PKDataDetectorTypePhoneNumber",
+    "PKDataDetectorTypeLink",
+    "PKDataDetectorTypeAddress",
+    "PKDataDetectorTypeCalendarEvent"
+  ]
+
   @doc """
   Validates the type of the attributed value.
 
@@ -150,6 +157,51 @@ defmodule ExPass.Utils.Validators do
   end
 
   def validate_currency_code(_), do: {:error, "Currency code must be a string or atom"}
+
+  @doc """
+  Validates the data_detector_types field.
+
+  The data_detector_types must be a list of valid detector type strings.
+
+  ## Returns
+
+    * `:ok` if the value is a valid list of detector types or nil.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_data_detector_types(["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"])
+      :ok
+
+      iex> validate_data_detector_types([])
+      :ok
+
+      iex> validate_data_detector_types(nil)
+      :ok
+
+      iex> validate_data_detector_types(["InvalidDetector"])
+      {:error, "Invalid data detector type: InvalidDetector. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent"}
+
+      iex> validate_data_detector_types("PKDataDetectorTypePhoneNumber")
+      {:error, "data_detector_types must be a list"}
+
+  """
+  @spec validate_data_detector_types(list(String.t()) | nil) :: :ok | {:error, String.t()}
+  def validate_data_detector_types(nil), do: :ok
+  def validate_data_detector_types([]), do: :ok
+
+  def validate_data_detector_types(types) when is_list(types) do
+    invalid_types = Enum.reject(types, &(&1 in @valid_detector_types))
+
+    if Enum.empty?(invalid_types) do
+      :ok
+    else
+      {:error,
+       "Invalid data detector type: #{Enum.join(invalid_types, ", ")}. Supported types are: #{Enum.join(@valid_detector_types, ", ")}"}
+    end
+  end
+
+  def validate_data_detector_types(_), do: {:error, "data_detector_types must be a list"}
 
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags

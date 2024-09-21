@@ -146,4 +146,62 @@ defmodule ExPass.Structs.FieldContentTest do
       assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
     end
   end
+
+  describe "data_detector_types" do
+    test "new/1 creates a valid FieldContent struct with valid data_detector_types" do
+      input = %{
+        attributed_value: "Contact us at info@example.com",
+        data_detector_types: ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"]
+      }
+
+      result = FieldContent.new(input)
+
+      assert %FieldContent{
+               attributed_value: "Contact us at info@example.com",
+               data_detector_types: ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"]
+             } = result
+
+      assert Jason.encode!(result) ==
+               ~s({"attributedValue":"Contact us at info@example.com","dataDetectorTypes":["PKDataDetectorTypePhoneNumber","PKDataDetectorTypeLink"]})
+    end
+
+    test "new/1 creates a valid FieldContent struct with empty data_detector_types" do
+      input = %{attributed_value: "No detectors", data_detector_types: []}
+      result = FieldContent.new(input)
+
+      assert %FieldContent{attributed_value: "No detectors", data_detector_types: []} = result
+
+      assert Jason.encode!(result) ==
+               ~s({"attributedValue":"No detectors","dataDetectorTypes":[]})
+    end
+
+    test "new/1 allows nil data_detector_types" do
+      result = FieldContent.new(%{attributed_value: "Default detectors"})
+
+      assert %FieldContent{attributed_value: "Default detectors", data_detector_types: nil} =
+               result
+
+      assert Jason.encode!(result) == ~s({"attributedValue":"Default detectors"})
+    end
+
+    test "new/1 raises ArgumentError for invalid data_detector_types" do
+      assert_raise ArgumentError,
+                   ~r/Invalid data detector type: InvalidDetector. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent/,
+                   fn ->
+                     FieldContent.new(%{
+                       attributed_value: "Invalid",
+                       data_detector_types: ["InvalidDetector"]
+                     })
+                   end
+    end
+
+    test "new/1 raises ArgumentError when data_detector_types is not a list" do
+      assert_raise ArgumentError, ~r/data_detector_types must be a list/, fn ->
+        FieldContent.new(%{
+          attributed_value: "Invalid",
+          data_detector_types: "PKDataDetectorTypePhoneNumber"
+        })
+      end
+    end
+  end
 end
