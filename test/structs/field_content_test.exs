@@ -363,4 +363,48 @@ defmodule ExPass.Structs.FieldContentTest do
       assert encoded =~ ~s("key":"trimmed_key")
     end
   end
+
+  describe "label" do
+    test "new/1 creates a valid FieldContent struct with a label" do
+      result = FieldContent.new(%{key: "test_key", label: "Test Label"})
+
+      assert %FieldContent{key: "test_key", label: "Test Label"} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("label":"Test Label")
+    end
+
+    test "new/1 creates a valid FieldContent struct without a label" do
+      result = FieldContent.new(%{key: "test_key"})
+
+      assert %FieldContent{key: "test_key", label: nil} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      refute encoded =~ "label"
+    end
+
+    test "new/1 trims whitespace from label" do
+      result = FieldContent.new(%{key: "test_key", label: "  Trimmed Label  "})
+
+      assert %FieldContent{key: "test_key", label: "Trimmed Label"} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("label":"Trimmed Label")
+    end
+
+    test "new/1 raises ArgumentError when label is not a string" do
+      assert_raise ArgumentError, ~r/label must be a string/, fn ->
+        FieldContent.new(%{key: "test_key", label: 123})
+      end
+    end
+
+    test "new/1 allows an empty string for label" do
+      result = FieldContent.new(%{key: "test_key", label: ""})
+
+      assert %FieldContent{key: "test_key", label: ""} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("label":"")
+    end
+  end
 end

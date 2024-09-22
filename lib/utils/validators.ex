@@ -324,6 +324,41 @@ defmodule ExPass.Utils.Validators do
   def validate_required_string(value, _field_name) when is_binary(value), do: :ok
   def validate_required_string(_, field_name), do: {:error, "#{field_name} must be a string"}
 
+  @doc """
+  Validates an optional string field.
+
+  The field must be a string or nil.
+
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `field_name` - The name of the field being validated as an atom.
+
+  ## Returns
+
+    * `:ok` if the value is a valid string or nil.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_optional_string("valid string", :label)
+      :ok
+
+      iex> validate_optional_string("", :label)
+      :ok
+
+      iex> validate_optional_string(nil, :label)
+      :ok
+
+      iex> validate_optional_string(123, :label)
+      {:error, "label must be a string"}
+
+  """
+  @spec validate_optional_string(String.t() | nil, atom()) :: :ok | {:error, String.t()}
+  def validate_optional_string(nil, _field_name), do: :ok
+  def validate_optional_string(value, _field_name) when is_binary(value), do: :ok
+  def validate_optional_string(_, field_name), do: {:error, "#{field_name} must be a string"}
+
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
     string_without_anchors = String.replace(string, ~r{<a\s[^>]*>.*?</a>|<a\s[^>]*/>}, "")
