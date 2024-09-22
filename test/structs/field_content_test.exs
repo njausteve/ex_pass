@@ -11,47 +11,60 @@ defmodule ExPass.Structs.FieldContentTest do
       message = "Balance updated"
 
       assert_raise ArgumentError, ~r/Invalid change_message: "Balance updated"/, fn ->
-        FieldContent.new(%{change_message: message})
+        FieldContent.new(%{key: "test_key", change_message: message})
       end
     end
 
     test "new/1 creates a FieldContent struct with valid change_message containing '%@' placeholder" do
       message = "Balance updated to %@"
-      result = FieldContent.new(%{change_message: message})
+      result = FieldContent.new(%{key: "test_key", change_message: message})
 
       assert result.change_message == message
-      assert Jason.encode!(result) == ~s({"changeMessage":"Balance updated to %@"})
+      assert result.key == "test_key"
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("changeMessage":"Balance updated to %@")
     end
 
     test "new/1 trims whitespace from change_message while preserving '%@' placeholder" do
       message = "  Trimmed message %@  "
-      result = FieldContent.new(%{change_message: message})
+      result = FieldContent.new(%{key: "test_key", change_message: message})
 
       assert result.change_message == "Trimmed message %@"
-      assert Jason.encode!(result) == ~s({"changeMessage":"Trimmed message %@"})
+      assert result.key == "test_key"
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("changeMessage":"Trimmed message %@")
     end
   end
 
   describe "attributed_value" do
     test "new/1 creates an empty FieldContent struct when no attributes are provided" do
-      assert %FieldContent{attributed_value: nil} = FieldContent.new()
-      assert Jason.encode!(FieldContent.new()) == ~s({})
+      result = FieldContent.new(%{key: "test_key"})
+      assert %FieldContent{attributed_value: nil} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      refute encoded =~ "attributedValue"
     end
 
     test "new/1 creates a valid FieldContent struct with string" do
       input_string = "Hello, World!"
-      result = FieldContent.new(%{attributed_value: input_string})
+      result = FieldContent.new(%{key: "test_key", attributed_value: input_string})
 
       assert %FieldContent{attributed_value: ^input_string} = result
-      assert Jason.encode!(result) == ~s({"attributedValue":"Hello, World!"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("attributedValue":"Hello, World!")
     end
 
     test "new/1 creates a valid FieldContent struct with number" do
       input_number = 42
-      result = FieldContent.new(%{attributed_value: input_number})
+      result = FieldContent.new(%{key: "test_key", attributed_value: input_number})
 
       assert %FieldContent{attributed_value: ^input_number} = result
-      assert Jason.encode!(result) == ~s({"attributedValue":42})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("attributedValue":42)
     end
 
     test "new/1 raises ArgumentError for invalid attributed_value types" do
@@ -59,82 +72,92 @@ defmodule ExPass.Structs.FieldContentTest do
 
       for invalid_value <- invalid_values do
         assert_raise ArgumentError, ~r/Invalid attributed_value:/, fn ->
-          FieldContent.new(%{attributed_value: invalid_value})
+          FieldContent.new(%{key: "test_key", attributed_value: invalid_value})
         end
       end
     end
 
     test "new/1 creates a valid FieldContent struct with DateTime" do
       input_time = DateTime.utc_now()
-      result = FieldContent.new(%{attributed_value: input_time})
+      result = FieldContent.new(%{key: "test_key", attributed_value: input_time})
 
       assert %FieldContent{attributed_value: ^input_time} = result
-      assert Jason.encode!(result) == ~s({"attributedValue":"#{DateTime.to_iso8601(input_time)}"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("attributedValue":"#{DateTime.to_iso8601(input_time)}")
     end
 
     test "new/1 creates a valid FieldContent struct with Date" do
       input_date = Date.utc_today()
-      result = FieldContent.new(%{attributed_value: input_date})
+      result = FieldContent.new(%{key: "test_key", attributed_value: input_date})
 
       assert %FieldContent{attributed_value: ^input_date} = result
-      assert Jason.encode!(result) == ~s({"attributedValue":"#{Date.to_iso8601(input_date)}"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("attributedValue":"#{Date.to_iso8601(input_date)}")
     end
 
     test "new/1 raises ArgumentError for attributed_value with unsupported HTML tag" do
       input_value = "<span>Unsupported tag</span>"
 
       assert_raise ArgumentError, ~r/Invalid attributed_value:/, fn ->
-        FieldContent.new(%{attributed_value: input_value})
+        FieldContent.new(%{key: "test_key", attributed_value: input_value})
       end
     end
 
     test "new/1 creates a valid FieldContent struct with supported HTML tag" do
       input_value = "<a href='http://example.com'>Link</a>"
-      result = FieldContent.new(%{attributed_value: input_value})
+      result = FieldContent.new(%{key: "test_key", attributed_value: input_value})
 
       assert %FieldContent{attributed_value: ^input_value} = result
-
-      assert Jason.encode!(result) ==
-               ~s({"attributedValue":"<a href='http://example.com'>Link</a>"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("attributedValue":"<a href='http://example.com'>Link</a>")
     end
   end
 
   describe "currency_code" do
     test "new/1 creates a valid FieldContent struct with valid currency_code as string" do
-      result = FieldContent.new(%{currency_code: "USD"})
+      result = FieldContent.new(%{key: "test_key", currency_code: "USD"})
 
       assert %FieldContent{currency_code: "USD"} = result
-      assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("currencyCode":"USD")
     end
 
     test "new/1 creates a valid FieldContent struct with valid currency_code as atom" do
-      result = FieldContent.new(%{currency_code: :USD})
+      result = FieldContent.new(%{key: "test_key", currency_code: :USD})
 
       assert %FieldContent{currency_code: :USD} = result
-      assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("currencyCode":"USD")
     end
 
     test "new/1 raises ArgumentError for invalid currency_code" do
       assert_raise ArgumentError, ~r/Invalid currency code INVALID/, fn ->
-        FieldContent.new(%{currency_code: "INVALID"})
+        FieldContent.new(%{key: "test_key", currency_code: "INVALID"})
       end
 
       assert_raise ArgumentError, ~r/Invalid currency code INVALID/, fn ->
-        FieldContent.new(%{currency_code: :INVALID})
+        FieldContent.new(%{key: "test_key", currency_code: :INVALID})
       end
     end
 
     test "new/1 raises ArgumentError when currency_code is not a string or atom" do
       assert_raise ArgumentError, ~r/Currency code must be a string or atom/, fn ->
-        FieldContent.new(%{currency_code: 123})
+        FieldContent.new(%{key: "test_key", currency_code: 123})
       end
     end
 
     test "new/1 trims whitespace from currency_code string" do
-      result = FieldContent.new(%{currency_code: "  USD  "})
+      result = FieldContent.new(%{key: "test_key", currency_code: "  USD  "})
 
       assert %FieldContent{currency_code: "USD"} = result
-      assert Jason.encode!(result) == ~s({"currencyCode":"USD"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("currencyCode":"USD")
     end
   end
 
@@ -142,6 +165,7 @@ defmodule ExPass.Structs.FieldContentTest do
     test "new/1 creates a valid FieldContent struct with valid data_detector_types" do
       result =
         FieldContent.new(%{
+          key: "test_key",
           data_detector_types: ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"]
         })
 
@@ -149,16 +173,21 @@ defmodule ExPass.Structs.FieldContentTest do
                data_detector_types: ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink"]
              } = result
 
-      assert Jason.encode!(result) ==
-               ~s({"dataDetectorTypes":["PKDataDetectorTypePhoneNumber","PKDataDetectorTypeLink"]})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+
+      assert encoded =~
+               ~s("dataDetectorTypes":["PKDataDetectorTypePhoneNumber","PKDataDetectorTypeLink"])
     end
 
     test "new/1 creates a valid FieldContent struct with empty data_detector_types" do
-      result = FieldContent.new(%{data_detector_types: []})
+      result = FieldContent.new(%{key: "test_key", data_detector_types: []})
 
       assert %FieldContent{data_detector_types: []} = result
 
-      assert Jason.encode!(result) == ~s({"dataDetectorTypes":[]})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("dataDetectorTypes":[])
     end
 
     test "new/1 raises ArgumentError for invalid data_detector_types" do
@@ -166,6 +195,7 @@ defmodule ExPass.Structs.FieldContentTest do
                    ~r/Invalid data detector type: InvalidDetector. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent/,
                    fn ->
                      FieldContent.new(%{
+                       key: "test_key",
                        data_detector_types: ["InvalidDetector"]
                      })
                    end
@@ -174,6 +204,7 @@ defmodule ExPass.Structs.FieldContentTest do
     test "new/1 raises ArgumentError when data_detector_types is not a list" do
       assert_raise ArgumentError, ~r/data_detector_types must be a list/, fn ->
         FieldContent.new(%{
+          key: "test_key",
           data_detector_types: "PKDataDetectorTypePhoneNumber"
         })
       end
@@ -182,11 +213,13 @@ defmodule ExPass.Structs.FieldContentTest do
 
   describe "date_style" do
     test "new/1 creates a valid FieldContent struct with date_style" do
-      result = FieldContent.new(%{date_style: "PKDateStyleShort"})
+      result = FieldContent.new(%{key: "test_key", date_style: "PKDateStyleShort"})
 
       assert %FieldContent{date_style: "PKDateStyleShort"} = result
 
-      assert Jason.encode!(result) == ~s({"dateStyle":"PKDateStyleShort"})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("dateStyle":"PKDateStyleShort")
     end
 
     test "new/1 allows all valid date_style values" do
@@ -199,8 +232,11 @@ defmodule ExPass.Structs.FieldContentTest do
       ]
 
       for style <- valid_styles do
-        result = FieldContent.new(%{date_style: style})
+        result = FieldContent.new(%{key: "test_key", date_style: style})
         assert %FieldContent{date_style: ^style} = result
+        encoded = Jason.encode!(result)
+        assert encoded =~ ~s("key":"test_key")
+        assert encoded =~ ~s("dateStyle":"#{style}")
       end
     end
 
@@ -209,6 +245,7 @@ defmodule ExPass.Structs.FieldContentTest do
                    ~r/Invalid date_style: InvalidStyle. Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull/,
                    fn ->
                      FieldContent.new(%{
+                       key: "test_key",
                        date_style: "InvalidStyle"
                      })
                    end
@@ -216,66 +253,114 @@ defmodule ExPass.Structs.FieldContentTest do
 
     test "new/1 raises ArgumentError when date_style is not a string" do
       assert_raise ArgumentError, ~r/date_style must be a string/, fn ->
-        FieldContent.new(%{date_style: :PKDateStyleShort})
+        FieldContent.new(%{key: "test_key", date_style: :PKDateStyleShort})
       end
     end
   end
 
   describe "ignores_time_zone" do
     test "new/1 creates a valid FieldContent struct with ignores_time_zone set to true" do
-      result = FieldContent.new(%{ignores_time_zone: true})
+      result = FieldContent.new(%{key: "test_key", ignores_time_zone: true})
 
       assert %FieldContent{ignores_time_zone: true} = result
-      assert Jason.encode!(result) == ~s({"ignoresTimeZone":true})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("ignoresTimeZone":true)
     end
 
     test "new/1 creates a valid FieldContent struct with ignores_time_zone set to false" do
-      result = FieldContent.new(%{ignores_time_zone: false})
+      result = FieldContent.new(%{key: "test_key", ignores_time_zone: false})
 
       assert %FieldContent{ignores_time_zone: false} = result
-      assert Jason.encode!(result) == ~s({"ignoresTimeZone":false})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("ignoresTimeZone":false)
     end
 
     test "new/1 defaults to nil when ignores_time_zone is not provided" do
-      result = FieldContent.new(%{})
+      result = FieldContent.new(%{key: "test_key"})
 
       assert %FieldContent{ignores_time_zone: nil} = result
-      assert Jason.encode!(result) == ~s({})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      refute encoded =~ "ignoresTimeZone"
     end
 
     test "new/1 raises ArgumentError when ignores_time_zone is not a boolean" do
       assert_raise ArgumentError, ~r/ignores_time_zone must be a boolean/, fn ->
-        FieldContent.new(%{ignores_time_zone: "true"})
+        FieldContent.new(%{key: "test_key", ignores_time_zone: "true"})
       end
     end
   end
 
   describe "is_relative" do
     test "new/1 creates a valid FieldContent struct with is_relative set to true" do
-      result = FieldContent.new(%{is_relative: true})
+      result = FieldContent.new(%{key: "test_key", is_relative: true})
 
       assert %FieldContent{is_relative: true} = result
-      assert Jason.encode!(result) == ~s({"isRelative":true})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("isRelative":true)
     end
 
     test "new/1 creates a valid FieldContent struct with is_relative set to false" do
-      result = FieldContent.new(%{is_relative: false})
+      result = FieldContent.new(%{key: "test_key", is_relative: false})
 
       assert %FieldContent{is_relative: false} = result
-      assert Jason.encode!(result) == ~s({"isRelative":false})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("isRelative":false)
     end
 
     test "new/1 defaults to nil when is_relative is not provided" do
-      result = FieldContent.new(%{})
+      result = FieldContent.new(%{key: "test_key"})
 
       assert %FieldContent{is_relative: nil} = result
-      assert Jason.encode!(result) == ~s({})
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      refute encoded =~ "isRelative"
     end
 
     test "new/1 raises ArgumentError when is_relative is not a boolean" do
       assert_raise ArgumentError, ~r/is_relative must be a boolean/, fn ->
-        FieldContent.new(%{is_relative: "true"})
+        FieldContent.new(%{key: "test_key", is_relative: "true"})
       end
+    end
+  end
+
+  describe "key" do
+    test "new/1 creates a valid FieldContent struct with a key" do
+      result = FieldContent.new(%{key: "unique_identifier"})
+
+      assert %FieldContent{key: "unique_identifier"} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"unique_identifier")
+    end
+
+    test "new/1 raises ArgumentError when key is not provided" do
+      assert_raise ArgumentError, ~r/key is required/, fn ->
+        FieldContent.new(%{})
+      end
+    end
+
+    test "new/1 raises ArgumentError when key is an empty string" do
+      assert_raise ArgumentError, ~r/key cannot be an empty string/, fn ->
+        FieldContent.new(%{key: ""})
+      end
+    end
+
+    test "new/1 raises ArgumentError when key is not a string" do
+      assert_raise ArgumentError, ~r/key must be a string/, fn ->
+        FieldContent.new(%{key: 123})
+      end
+    end
+
+    test "new/1 trims whitespace from key" do
+      result = FieldContent.new(%{key: "  trimmed_key  "})
+
+      assert %FieldContent{key: "trimmed_key"} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"trimmed_key")
     end
   end
 end
