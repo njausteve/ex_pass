@@ -285,6 +285,45 @@ defmodule ExPass.Utils.Validators do
   def validate_boolean_field(value, _field_name) when is_boolean(value), do: :ok
   def validate_boolean_field(_, field_name), do: {:error, "#{field_name} must be a boolean"}
 
+  @doc """
+  Validates a required string field.
+
+  The field must be a non-empty string.
+
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `field_name` - The name of the field being validated as an atom.
+
+  ## Returns
+
+    * `:ok` if the value is a valid non-empty string.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_required_string("valid string", :key)
+      :ok
+
+      iex> validate_required_string("", :key)
+      {:error, "key cannot be an empty string"}
+
+      iex> validate_required_string(nil, :key)
+      {:error, "key is required"}
+
+      iex> validate_required_string(123, :key)
+      {:error, "key must be a string"}
+
+  """
+  @spec validate_required_string(String.t() | nil, atom()) :: :ok | {:error, String.t()}
+  def validate_required_string(nil, field_name), do: {:error, "#{field_name} is required"}
+
+  def validate_required_string("", field_name),
+    do: {:error, "#{field_name} cannot be an empty string"}
+
+  def validate_required_string(value, _field_name) when is_binary(value), do: :ok
+  def validate_required_string(_, field_name), do: {:error, "#{field_name} must be a string"}
+
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
     string_without_anchors = String.replace(string, ~r{<a\s[^>]*>.*?</a>|<a\s[^>]*/>}, "")
