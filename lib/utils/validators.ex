@@ -26,6 +26,13 @@ defmodule ExPass.Utils.Validators do
     "PKDateStyleFull"
   ]
 
+  @valid_number_styles [
+    "PKNumberStyleDecimal",
+    "PKNumberStylePercent",
+    "PKNumberStyleScientific",
+    "PKNumberStyleSpellOut"
+  ]
+
   @doc """
   Validates the type of the attributed value.
 
@@ -358,6 +365,45 @@ defmodule ExPass.Utils.Validators do
   def validate_optional_string(nil, _field_name), do: :ok
   def validate_optional_string(value, _field_name) when is_binary(value), do: :ok
   def validate_optional_string(_, field_name), do: {:error, "#{field_name} must be a string"}
+
+  @doc """
+  Validates the number_style field.
+
+  The number_style must be a valid number style string.
+
+  ## Returns
+
+    * `:ok` if the value is a valid number style string or nil.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_number_style("PKNumberStyleDecimal")
+      :ok
+
+      iex> validate_number_style(nil)
+      :ok
+
+      iex> validate_number_style("InvalidStyle")
+      {:error, "Invalid number_style: InvalidStyle. Supported values are: PKNumberStyleDecimal, PKNumberStylePercent, PKNumberStyleScientific, PKNumberStyleSpellOut"}
+
+      iex> validate_number_style(42)
+      {:error, "number_style must be a string"}
+
+  """
+  @spec validate_number_style(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_number_style(nil), do: :ok
+
+  def validate_number_style(value) when is_binary(value) do
+    if value in @valid_number_styles do
+      :ok
+    else
+      {:error,
+       "Invalid number_style: #{value}. Supported values are: #{Enum.join(@valid_number_styles, ", ")}"}
+    end
+  end
+
+  def validate_number_style(_), do: {:error, "number_style must be a string"}
 
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags

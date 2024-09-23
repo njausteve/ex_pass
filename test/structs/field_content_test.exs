@@ -407,4 +407,43 @@ defmodule ExPass.Structs.FieldContentTest do
       assert encoded =~ ~s("label":"")
     end
   end
+
+  describe "number_style" do
+    test "new/1 creates a valid FieldContent struct with number_style" do
+      result = FieldContent.new(%{key: "test_key", number_style: "PKNumberStyleDecimal"})
+
+      assert %FieldContent{key: "test_key", number_style: "PKNumberStyleDecimal"} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("numberStyle":"PKNumberStyleDecimal")
+    end
+
+    test "new/1 raises ArgumentError for invalid number_style" do
+      assert_raise ArgumentError, ~r/Invalid number_style/, fn ->
+        FieldContent.new(%{key: "test_key", number_style: "InvalidStyle"})
+      end
+    end
+
+    test "new/1 allows nil for number_style" do
+      result = FieldContent.new(%{key: "test_key", number_style: nil})
+
+      assert %FieldContent{key: "test_key", number_style: nil} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      refute encoded =~ "numberStyle"
+    end
+
+    test "new/1 creates a valid FieldContent struct with all number_style options" do
+      styles = ["PKNumberStyleDecimal", "PKNumberStylePercent", "PKNumberStyleScientific", "PKNumberStyleSpellOut"]
+
+      Enum.each(styles, fn style ->
+        result = FieldContent.new(%{key: "test_key", number_style: style})
+
+        assert %FieldContent{key: "test_key", number_style: ^style} = result
+        encoded = Jason.encode!(result)
+        assert encoded =~ ~s("key":"test_key")
+        assert encoded =~ ~s("numberStyle":"#{style}")
+      end)
+    end
+  end
 end
