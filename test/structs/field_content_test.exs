@@ -10,9 +10,11 @@ defmodule ExPass.Structs.FieldContentTest do
     test "new/1 raises ArgumentError for invalid change_message without '%@' placeholder" do
       message = "Balance updated"
 
-      assert_raise ArgumentError, "The change_message must be a string containing the '%@' placeholder for the new value.", fn ->
-        FieldContent.new(%{key: "test_key", change_message: message})
-      end
+      assert_raise ArgumentError,
+                   "The change_message must be a string containing the '%@' placeholder for the new value.",
+                   fn ->
+                     FieldContent.new(%{key: "test_key", change_message: message})
+                   end
     end
 
     test "new/1 creates a FieldContent struct with valid change_message containing '%@' placeholder" do
@@ -71,9 +73,11 @@ defmodule ExPass.Structs.FieldContentTest do
       invalid_values = [%{}, [1, 2, 3], self(), :atom]
 
       for invalid_value <- invalid_values do
-        assert_raise ArgumentError, "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date", fn ->
-          FieldContent.new(%{key: "test_key", attributed_value: invalid_value})
-        end
+        assert_raise ArgumentError,
+                     "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date",
+                     fn ->
+                       FieldContent.new(%{key: "test_key", attributed_value: invalid_value})
+                     end
       end
     end
 
@@ -100,9 +104,11 @@ defmodule ExPass.Structs.FieldContentTest do
     test "new/1 raises ArgumentError for attributed_value with unsupported HTML tag" do
       input_value = "<span>Unsupported tag</span>"
 
-      assert_raise ArgumentError, "Supported types are: String (including <a></a> tag), number, DateTime and Date", fn ->
-        FieldContent.new(%{key: "test_key", attributed_value: input_value})
-      end
+      assert_raise ArgumentError,
+                   "Supported types are: String (including <a></a> tag), number, DateTime and Date",
+                   fn ->
+                     FieldContent.new(%{key: "test_key", attributed_value: input_value})
+                   end
     end
 
     test "new/1 creates a valid FieldContent struct with supported HTML tag" do
