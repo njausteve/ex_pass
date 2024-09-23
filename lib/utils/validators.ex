@@ -46,7 +46,7 @@ defmodule ExPass.Utils.Validators do
   ## Returns
 
     * `:ok` if the value is of a valid type.
-    * `{:error, "invalid attributed_value type"}` if the value is not of a valid type.
+    * `{:error, reason}` if the value is not of a valid type, where reason is a string explaining the error.
 
   ## Examples
 
@@ -63,7 +63,7 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_attributed_value(%{})
-      {:error, "invalid attributed_value type"}
+      {:error, "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date"}
 
   """
   @spec validate_attributed_value(String.t() | number() | DateTime.t() | Date.t() | nil) ::
@@ -73,7 +73,7 @@ defmodule ExPass.Utils.Validators do
 
   def validate_attributed_value(value) when is_binary(value) do
     case contains_unsupported_html_tags?(value) do
-      true -> {:error, "contains unsupported HTML tags"}
+      true -> {:error, "Supported types are: String (including <a></a> tag), number, DateTime and Date"}
       false -> :ok
     end
   end
@@ -90,7 +90,7 @@ defmodule ExPass.Utils.Validators do
     :ok
   end
 
-  def validate_attributed_value(_), do: {:error, "invalid attributed_value type"}
+  def validate_attributed_value(_), do: {:error, "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date"}
 
   @doc """
   Validates the change_message field.
@@ -108,13 +108,13 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_change_message("Invalid message without placeholder")
-      {:error, "change_message must contain '%@' placeholder"}
+      {:error, "The change_message must be a string containing the '%@' placeholder for the new value."}
 
       iex> validate_change_message(nil)
       :ok
 
       iex> validate_change_message(42)
-      {:error, "change_message must be a string"}
+      {:error, "The change_message must be a string containing the '%@' placeholder for the new value."}
 
   """
   @spec validate_change_message(String.t() | nil) :: :ok | {:error, String.t()}
@@ -124,11 +124,11 @@ defmodule ExPass.Utils.Validators do
     if String.contains?(value, "%@") do
       :ok
     else
-      {:error, "change_message must contain '%@' placeholder"}
+      {:error, "The change_message must be a string containing the '%@' placeholder for the new value."}
     end
   end
 
-  def validate_change_message(_), do: {:error, "change_message must be a string"}
+  def validate_change_message(_), do: {:error, "The change_message must be a string containing the '%@' placeholder for the new value."}
 
   @doc """
   Validates the currency_code field.
@@ -149,7 +149,7 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_currency_code("INVALID")
-      {:error, "Invalid currency code"}
+      {:error, "Invalid currency code INVALID"}
 
       iex> validate_currency_code(nil)
       :ok
@@ -284,13 +284,13 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_boolean_field("true", :is_relative)
-      {:error, "is_relative must be a boolean"}
+      {:error, "is_relative must be a boolean value (true or false)"}
 
   """
   @spec validate_boolean_field(boolean() | nil, atom()) :: :ok | {:error, String.t()}
   def validate_boolean_field(nil, _field_name), do: :ok
   def validate_boolean_field(value, _field_name) when is_boolean(value), do: :ok
-  def validate_boolean_field(_, field_name), do: {:error, "#{field_name} must be a boolean"}
+  def validate_boolean_field(_, field_name), do: {:error, "#{field_name} must be a boolean value (true or false)"}
 
   @doc """
   Validates a required string field.
@@ -316,20 +316,20 @@ defmodule ExPass.Utils.Validators do
       {:error, "key cannot be an empty string"}
 
       iex> validate_required_string(nil, :key)
-      {:error, "key is required"}
+      {:error, "key is a required field and must be a non-empty string"}
 
       iex> validate_required_string(123, :key)
-      {:error, "key must be a string"}
+      {:error, "key is a required field and must be a non-empty string"}
 
   """
   @spec validate_required_string(String.t() | nil, atom()) :: :ok | {:error, String.t()}
-  def validate_required_string(nil, field_name), do: {:error, "#{field_name} is required"}
+  def validate_required_string(nil, field_name), do: {:error, "#{field_name} is a required field and must be a non-empty string"}
 
   def validate_required_string("", field_name),
     do: {:error, "#{field_name} cannot be an empty string"}
 
   def validate_required_string(value, _field_name) when is_binary(value), do: :ok
-  def validate_required_string(_, field_name), do: {:error, "#{field_name} must be a string"}
+  def validate_required_string(_, field_name), do: {:error, "#{field_name} is a required field and must be a non-empty string"}
 
   @doc """
   Validates an optional string field.
@@ -358,13 +358,13 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_optional_string(123, :label)
-      {:error, "label must be a string"}
+      {:error, "label must be a string if provided"}
 
   """
   @spec validate_optional_string(String.t() | nil, atom()) :: :ok | {:error, String.t()}
   def validate_optional_string(nil, _field_name), do: :ok
   def validate_optional_string(value, _field_name) when is_binary(value), do: :ok
-  def validate_optional_string(_, field_name), do: {:error, "#{field_name} must be a string"}
+  def validate_optional_string(_, field_name), do: {:error, "#{field_name} must be a string if provided"}
 
   @doc """
   Validates the number_style field.

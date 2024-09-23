@@ -212,48 +212,8 @@ defmodule ExPass.Structs.FieldContent do
         attrs
 
       {:error, reason} ->
-        error_message = get_error_message(key, attrs[key], reason)
-        raise ArgumentError, error_message
+        raise ArgumentError, reason
     end
-  end
-
-  defp get_error_message(key, value, reason) do
-    base_message = """
-    Invalid #{key}: #{inspect(value)}
-    Reason: #{reason}
-    """
-
-    additional_info =
-      case key do
-        :attributed_value ->
-          "Supported types are: String (including <a></a> tag), number, DateTime and Date"
-
-        :change_message ->
-          "The change_message must be a string containing the '%@' placeholder for the new value."
-
-        :data_detector_types ->
-          "data_detector_types must be a list of valid detector type strings. Use an empty list to disable all detectors."
-
-        :date_style ->
-          "Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull"
-
-        key when key in [:ignores_time_zone, :is_relative] ->
-          "#{key} must be a boolean value (true or false)"
-
-        :key ->
-          "key is a required field and must be a non-empty string"
-
-        :label ->
-          "label must be a string if provided"
-
-        :number_style ->
-          "Supported values are: PKNumberStyleDecimal, PKNumberStylePercent, PKNumberStyleScientific, PKNumberStyleSpellOut"
-
-        _ ->
-          ""
-      end
-
-    base_message <> additional_info
   end
 
   defimpl Jason.Encoder do
