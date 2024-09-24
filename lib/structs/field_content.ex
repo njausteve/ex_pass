@@ -48,6 +48,13 @@ defmodule ExPass.Structs.FieldContent do
   - `key`: A unique key that identifies a field in the pass. This field is required.
 
   - `label`: The text for a field label. This field is optional.
+
+  - `number_style`: The style of the number to display in the field.
+     Supported values are:
+     * "PKNumberStyleDecimal"
+     * "PKNumberStylePercent"
+     * "PKNumberStyleScientific"
+     * "PKNumberStyleSpellOut"
   """
 
   use TypedStruct
@@ -108,6 +115,17 @@ defmodule ExPass.Structs.FieldContent do
   """
   @type date_style() :: String.t()
 
+  @typedoc """
+  The style of the number to display in the field.
+
+  Optional. Valid values are:
+  - "PKNumberStyleDecimal"
+  - "PKNumberStylePercent"
+  - "PKNumberStyleScientific"
+  - "PKNumberStyleSpellOut"
+  """
+  @type number_style() :: String.t()
+
   typedstruct do
     field :attributed_value, attributed_value(), default: nil
     field :change_message, String.t(), default: nil
@@ -118,6 +136,7 @@ defmodule ExPass.Structs.FieldContent do
     field :is_relative, boolean(), default: nil
     field :key, String.t(), enforce: true
     field :label, String.t(), default: nil
+    field :number_style, number_style(), default: nil
   end
 
   @doc """
@@ -134,6 +153,7 @@ defmodule ExPass.Structs.FieldContent do
   • is_relative
   • key
   • label
+  • number_style
 
   ## Parameters
 
@@ -150,10 +170,10 @@ defmodule ExPass.Structs.FieldContent do
   ## Examples
 
       iex> FieldContent.new(%{key: "field1", attributed_value: "Hello, World!"})
-      %FieldContent{key: "field1", attributed_value: "Hello, World!", change_message: nil, currency_code: nil, data_detector_types: nil, date_style: nil, ignores_time_zone: nil, is_relative: nil, label: nil}
+      %FieldContent{key: "field1", attributed_value: "Hello, World!", change_message: nil, currency_code: nil, data_detector_types: nil, date_style: nil, ignores_time_zone: nil, is_relative: nil, label: nil, number_style: nil}
 
-      iex> FieldContent.new(%{key: "field2", attributed_value: 42, data_detector_types: ["PKDataDetectorTypePhoneNumber"], date_style: "PKDateStyleShort", ignores_time_zone: true, is_relative: false})
-      %FieldContent{key: "field2", attributed_value: 42, change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypePhoneNumber"], date_style: "PKDateStyleShort", ignores_time_zone: true, is_relative: false, label: nil}
+      iex> FieldContent.new(%{key: "field2", attributed_value: 42, data_detector_types: ["PKDataDetectorTypePhoneNumber"], date_style: "PKDateStyleShort", ignores_time_zone: true, is_relative: false, number_style: "PKNumberStyleDecimal"})
+      %FieldContent{key: "field2", attributed_value: 42, change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypePhoneNumber"], date_style: "PKDateStyleShort", ignores_time_zone: true, is_relative: false, label: nil, number_style: "PKNumberStyleDecimal"}
 
       iex> datetime = ~U[2023-04-15 14:30:00Z]
       iex> field_content = FieldContent.new(%{key: "field3", attributed_value: datetime, currency_code: "USD", date_style: "PKDateStyleLong", ignores_time_zone: true, is_relative: true})
@@ -161,11 +181,11 @@ defmodule ExPass.Structs.FieldContent do
       iex> field_content.change_message
       nil
 
-      iex> FieldContent.new(%{key: "field4", attributed_value: "<a href='http://example.com'>Click here</a>", data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull", is_relative: false})
-      %FieldContent{key: "field4", attributed_value: "<a href='http://example.com'>Click here</a>", change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull", ignores_time_zone: nil, is_relative: false, label: nil}
+      iex> FieldContent.new(%{key: "field4", attributed_value: "<a href='http://example.com'>Click here</a>", data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull", is_relative: false, number_style: "PKNumberStylePercent"})
+      %FieldContent{key: "field4", attributed_value: "<a href='http://example.com'>Click here</a>", change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull", ignores_time_zone: nil, is_relative: false, label: nil, number_style: "PKNumberStylePercent"}
 
-      iex> FieldContent.new(%{key: "field5", attributed_value: "No detectors", data_detector_types: [], change_message: "Updated to %@", ignores_time_zone: true, is_relative: true, label: "Field Label"})
-      %FieldContent{key: "field5", attributed_value: "No detectors", change_message: "Updated to %@", currency_code: nil, data_detector_types: [], date_style: nil, ignores_time_zone: true, is_relative: true, label: "Field Label"}
+      iex> FieldContent.new(%{key: "field5", attributed_value: "No detectors", data_detector_types: [], change_message: "Updated to %@", ignores_time_zone: true, is_relative: true, label: "Field Label", number_style: "PKNumberStyleScientific"})
+      %FieldContent{key: "field5", attributed_value: "No detectors", change_message: "Updated to %@", currency_code: nil, data_detector_types: [], date_style: nil, ignores_time_zone: true, is_relative: true, label: "Field Label", number_style: "PKNumberStyleScientific"}
   """
   @spec new(map()) :: %__MODULE__{}
   def new(attrs \\ %{}) do
@@ -181,6 +201,7 @@ defmodule ExPass.Structs.FieldContent do
       |> validate(:is_relative, &Validators.validate_boolean_field(&1, :is_relative))
       |> validate(:key, &Validators.validate_required_string(&1, :key))
       |> validate(:label, &Validators.validate_optional_string(&1, :label))
+      |> validate(:number_style, &Validators.validate_number_style/1)
 
     struct!(__MODULE__, attrs)
   end
@@ -191,45 +212,8 @@ defmodule ExPass.Structs.FieldContent do
         attrs
 
       {:error, reason} ->
-        error_message = get_error_message(key, attrs[key], reason)
-        raise ArgumentError, error_message
+        raise ArgumentError, reason
     end
-  end
-
-  defp get_error_message(key, value, reason) do
-    base_message = """
-    Invalid #{key}: #{inspect(value)}
-    Reason: #{reason}
-    """
-
-    additional_info =
-      case key do
-        :attributed_value ->
-          "Supported types are: String (including <a></a> tag), number, DateTime and Date"
-
-        :change_message ->
-          "The change_message must be a string containing the '%@' placeholder for the new value."
-
-        :data_detector_types ->
-          "data_detector_types must be a list of valid detector type strings. Use an empty list to disable all detectors."
-
-        :date_style ->
-          "Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull"
-
-        key when key in [:ignores_time_zone, :is_relative] ->
-          "#{key} must be a boolean value (true or false)"
-
-        :key ->
-          "key is a required field and must be a non-empty string"
-
-        :label ->
-          "label must be a string if provided"
-
-        _ ->
-          ""
-      end
-
-    base_message <> additional_info
   end
 
   defimpl Jason.Encoder do

@@ -10,9 +10,11 @@ defmodule ExPass.Structs.FieldContentTest do
     test "new/1 raises ArgumentError for invalid change_message without '%@' placeholder" do
       message = "Balance updated"
 
-      assert_raise ArgumentError, ~r/Invalid change_message: "Balance updated"/, fn ->
-        FieldContent.new(%{key: "test_key", change_message: message})
-      end
+      assert_raise ArgumentError,
+                   "The change_message must be a string containing the '%@' placeholder for the new value.",
+                   fn ->
+                     FieldContent.new(%{key: "test_key", change_message: message})
+                   end
     end
 
     test "new/1 creates a FieldContent struct with valid change_message containing '%@' placeholder" do
@@ -71,9 +73,11 @@ defmodule ExPass.Structs.FieldContentTest do
       invalid_values = [%{}, [1, 2, 3], self(), :atom]
 
       for invalid_value <- invalid_values do
-        assert_raise ArgumentError, ~r/Invalid attributed_value:/, fn ->
-          FieldContent.new(%{key: "test_key", attributed_value: invalid_value})
-        end
+        assert_raise ArgumentError,
+                     "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date",
+                     fn ->
+                       FieldContent.new(%{key: "test_key", attributed_value: invalid_value})
+                     end
       end
     end
 
@@ -100,9 +104,11 @@ defmodule ExPass.Structs.FieldContentTest do
     test "new/1 raises ArgumentError for attributed_value with unsupported HTML tag" do
       input_value = "<span>Unsupported tag</span>"
 
-      assert_raise ArgumentError, ~r/Invalid attributed_value:/, fn ->
-        FieldContent.new(%{key: "test_key", attributed_value: input_value})
-      end
+      assert_raise ArgumentError,
+                   "Supported types are: String (including <a></a> tag), number, DateTime and Date",
+                   fn ->
+                     FieldContent.new(%{key: "test_key", attributed_value: input_value})
+                   end
     end
 
     test "new/1 creates a valid FieldContent struct with supported HTML tag" do
@@ -338,7 +344,7 @@ defmodule ExPass.Structs.FieldContentTest do
     end
 
     test "new/1 raises ArgumentError when key is not provided" do
-      assert_raise ArgumentError, ~r/key is required/, fn ->
+      assert_raise ArgumentError, "key is a required field and must be a non-empty string", fn ->
         FieldContent.new(%{})
       end
     end
@@ -350,7 +356,7 @@ defmodule ExPass.Structs.FieldContentTest do
     end
 
     test "new/1 raises ArgumentError when key is not a string" do
-      assert_raise ArgumentError, ~r/key must be a string/, fn ->
+      assert_raise ArgumentError, "key is a required field and must be a non-empty string", fn ->
         FieldContent.new(%{key: 123})
       end
     end
@@ -405,6 +411,50 @@ defmodule ExPass.Structs.FieldContentTest do
       encoded = Jason.encode!(result)
       assert encoded =~ ~s("key":"test_key")
       assert encoded =~ ~s("label":"")
+    end
+  end
+
+  describe "number_style" do
+    test "new/1 creates a valid FieldContent struct with number_style" do
+      result = FieldContent.new(%{key: "test_key", number_style: "PKNumberStyleDecimal"})
+
+      assert %FieldContent{key: "test_key", number_style: "PKNumberStyleDecimal"} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      assert encoded =~ ~s("numberStyle":"PKNumberStyleDecimal")
+    end
+
+    test "new/1 raises ArgumentError for invalid number_style" do
+      assert_raise ArgumentError, ~r/Invalid number_style/, fn ->
+        FieldContent.new(%{key: "test_key", number_style: "InvalidStyle"})
+      end
+    end
+
+    test "new/1 allows nil for number_style" do
+      result = FieldContent.new(%{key: "test_key", number_style: nil})
+
+      assert %FieldContent{key: "test_key", number_style: nil} = result
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("key":"test_key")
+      refute encoded =~ "numberStyle"
+    end
+
+    test "new/1 creates a valid FieldContent struct with all number_style options" do
+      styles = [
+        "PKNumberStyleDecimal",
+        "PKNumberStylePercent",
+        "PKNumberStyleScientific",
+        "PKNumberStyleSpellOut"
+      ]
+
+      Enum.each(styles, fn style ->
+        result = FieldContent.new(%{key: "test_key", number_style: style})
+
+        assert %FieldContent{key: "test_key", number_style: ^style} = result
+        encoded = Jason.encode!(result)
+        assert encoded =~ ~s("key":"test_key")
+        assert encoded =~ ~s("numberStyle":"#{style}")
+      end)
     end
   end
 end
