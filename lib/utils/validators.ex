@@ -422,6 +422,72 @@ defmodule ExPass.Utils.Validators do
 
   def validate_number_style(_), do: {:error, "number_style must be a string"}
 
+  @doc """
+  Validates a required value field.
+
+  The field must be a non-nil value. The value can be a localizable string, ISO 8601 date, or number.
+
+  ## Parameters
+
+    * `value` - The value to validate. A date or time value must include a time zone.
+    * `field_name` - The name of the field being validated as an atom.
+
+  ## Returns
+
+    * `:ok` if the value is valid (non-nil).
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_required_value(42, :value)
+      :ok
+
+      iex> validate_required_value(nil, :value)
+      {:error, "value is a required field and cannot be nil"}
+
+      iex> validate_required_value("2021-09-15T15:53:00Z", :value)
+      :ok
+
+      iex> validate_required_value("localizable string", :value)
+      :ok
+
+      iex> validate_required_value(nil, :another_field)
+      {:error, "value is a required field and cannot be nil"}
+
+      iex> validate_required_value("2023-04-15T14:30:00", :value)
+      {:error, "Date value must include a time zone"}
+
+  """
+  @spec validate_required_value(String.t() | number() | DateTime.t() | Date.t() | nil, atom()) ::
+          :ok | {:error, String.t()}
+  def validate_required_value(nil, field_name),
+    do: {:error, "#{field_name} is a required field and cannot be nil"}
+
+  def validate_required_value(value, _field_name) when is_binary(value) do
+    if String.contains?(value, "T") and not String.contains?(value, "Z") do
+      {:error, "Date value must include a time zone"}
+    else
+      :ok
+    end
+  end
+
+  def validate_required_value(value, _field_name) when is_number(value), do: :ok
+
+  def validate_required_value(%DateTime{} = value, _field_name) do
+    DateTime.to_iso8601(value)
+
+    :ok
+  end
+
+  def validate_required_value(%Date{} = value, _field_name) do
+    Date.to_iso8601(value)
+
+    :ok
+  end
+
+  def validate_required_value(_value, field_name),
+    do: {:error, "#{field_name} must be a string, number, DateTime, or Date"}
+
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
     string_without_anchors = String.replace(string, ~r{<a\s[^>]*>.*?</a>|<a\s[^>]*/>}, "")
