@@ -12,6 +12,7 @@ defmodule ExPass.Structs.Barcodes do
   - `alt_text`: Optional. Text displayed near the barcode. For example, a human-readable version of the barcode data.
   - `format`: Required. The format of the barcode. Possible values are: PKBarcodeFormatQR, PKBarcodeFormatPDF417, PKBarcodeFormatAztec, PKBarcodeFormatCode128.
     Note: The barcode format PKBarcodeFormatCode128 isn't supported for watchOS.
+  - `message`: Required. The message or payload to display as a barcode.
   """
 
   use TypedStruct
@@ -22,6 +23,7 @@ defmodule ExPass.Structs.Barcodes do
   typedstruct do
     field :alt_text, String.t()
     field :format, String.t(), enforce: true
+    field :message, String.t(), enforce: true
   end
 
   @doc """
@@ -37,8 +39,8 @@ defmodule ExPass.Structs.Barcodes do
 
   ## Examples
 
-      iex> Barcodes.new(%{alt_text: "Scan this QR code", format: "PKBarcodeFormatQR"})
-      %Barcodes{alt_text: "Scan this QR code", format: "PKBarcodeFormatQR"}
+      iex> Barcodes.new(%{alt_text: "Scan this QR code", format: "PKBarcodeFormatQR", message: "123456789"})
+      %Barcodes{alt_text: "Scan this QR code", format: "PKBarcodeFormatQR", message: "123456789"}
 
   """
   @spec new(map()) :: %__MODULE__{}
@@ -48,6 +50,7 @@ defmodule ExPass.Structs.Barcodes do
       |> Converter.trim_string_values()
       |> validate(:alt_text, &Validators.validate_optional_string(&1, :alt_text))
       |> validate(:format, &Validators.validate_barcode_format/1)
+      |> validate(:message, &Validators.validate_required_string(&1, :message))
 
     struct!(__MODULE__, attrs)
   end
