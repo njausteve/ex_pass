@@ -26,6 +26,14 @@ defmodule ExPass.Utils.Validators do
     "PKDateStyleFull"
   ]
 
+  @valid_time_styles [
+    "PKDateStyleNone",
+    "PKDateStyleShort",
+    "PKDateStyleMedium",
+    "PKDateStyleLong",
+    "PKDateStyleFull"
+  ]
+
   @valid_number_styles [
     "PKNumberStyleDecimal",
     "PKNumberStylePercent",
@@ -273,6 +281,45 @@ defmodule ExPass.Utils.Validators do
   end
 
   def validate_date_style(_), do: {:error, "date_style must be a string"}
+
+  @doc """
+  Validates the time_style field.
+
+  The time_style must be a valid time style string.
+
+  ## Returns
+
+    * `:ok` if the value is a valid time style string or nil.
+    * `{:error, reason}` if the value is not valid, where reason is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_time_style("PKDateStyleShort")
+      :ok
+
+      iex> validate_time_style(nil)
+      :ok
+
+      iex> validate_time_style("InvalidStyle")
+      {:error, "Invalid time_style: InvalidStyle. Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull"}
+
+      iex> validate_time_style(42)
+      {:error, "time_style must be a string"}
+
+  """
+  @spec validate_time_style(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_time_style(nil), do: :ok
+
+  def validate_time_style(style) when is_binary(style) do
+    if style in @valid_time_styles do
+      :ok
+    else
+      {:error,
+       "Invalid time_style: #{style}. Supported values are: #{Enum.join(@valid_time_styles, ", ")}"}
+    end
+  end
+
+  def validate_time_style(_), do: {:error, "time_style must be a string"}
 
   @doc """
   Validates a boolean field.

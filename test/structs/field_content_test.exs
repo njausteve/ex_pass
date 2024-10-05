@@ -685,4 +685,101 @@ defmodule ExPass.Structs.FieldContentTest do
       refute encoded =~ "textAlignment"
     end
   end
+
+  describe "timeStyle" do
+    test "new/1 creates a valid FieldContent struct with time_style" do
+      time_styles = [
+        "PKDateStyleNone",
+        "PKDateStyleShort",
+        "PKDateStyleMedium",
+        "PKDateStyleLong",
+        "PKDateStyleFull"
+      ]
+
+      Enum.each(time_styles, fn style ->
+        result =
+          FieldContent.new(%{
+            key: "test_key",
+            value: "2023-04-15T14:30:00Z",
+            date_style: "PKDateStyleMedium",
+            time_style: style
+          })
+
+        assert %FieldContent{
+                 key: "test_key",
+                 value: "2023-04-15T14:30:00Z",
+                 date_style: "PKDateStyleMedium",
+                 time_style: ^style
+               } = result
+
+        encoded = Jason.encode!(result)
+        assert encoded =~ ~s("key":"test_key")
+        assert encoded =~ ~s("value":"2023-04-15T14:30:00Z")
+        assert encoded =~ ~s("dateStyle":"PKDateStyleMedium")
+        assert encoded =~ ~s("timeStyle":"#{style}")
+      end)
+    end
+
+    test "new/1 raises ArgumentError for invalid time_style" do
+      assert_raise ArgumentError, ~r/Invalid time_style/, fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          date_style: "PKDateStyleMedium",
+          time_style: "InvalidTimeStyle"
+        })
+      end
+    end
+
+    test "new/1 allows time_style to be nil" do
+      result =
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          date_style: "PKDateStyleMedium",
+          time_style: nil
+        })
+
+      assert %FieldContent{
+               key: "test_key",
+               value: "2023-04-15T14:30:00Z",
+               date_style: "PKDateStyleMedium",
+               time_style: nil
+             } = result
+
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("dateStyle":"PKDateStyleMedium")
+      refute encoded =~ "timeStyle"
+    end
+
+    test "new/1 allows timeStyle to be omitted" do
+      result =
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          date_style: "PKDateStyleMedium"
+        })
+
+      assert %FieldContent{
+               key: "test_key",
+               value: "2023-04-15T14:30:00Z",
+               date_style: "PKDateStyleMedium",
+               time_style: nil
+             } = result
+
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("dateStyle":"PKDateStyleMedium")
+      refute encoded =~ "timeStyle"
+    end
+
+    test "new/1 raises ArgumentError when time_style is not a string" do
+      assert_raise ArgumentError, ~r/time_style must be a string/, fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          time_style: 123
+        })
+      end
+    end
+  end
 end
