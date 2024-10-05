@@ -228,6 +228,33 @@ defmodule ExPass.Utils.Validators do
     "PKBarcodeFormatCode128"
   ]
 
+  @valid_message_encodings [
+    "US-ASCII",
+    "ISO-8859-1",
+    "ISO-8859-2",
+    "ISO-8859-3",
+    "ISO-8859-4",
+    "ISO-8859-5",
+    "ISO-8859-6",
+    "ISO-8859-7",
+    "ISO-8859-8",
+    "ISO-8859-9",
+    "ISO-8859-10",
+    "Shift_JIS",
+    "EUC-JP",
+    "ISO-2022-KR",
+    "EUC-KR",
+    "ISO-2022-JP",
+    "ISO-2022-JP-2",
+    "ISO-8859-6-E",
+    "ISO-8859-6-I",
+    "ISO-8859-8-E",
+    "ISO-8859-8-I",
+    "GB2312",
+    "Big5",
+    "KOI8-R"
+  ]
+
   @doc """
   Validates the type of the attributed value.
 
@@ -723,6 +750,45 @@ defmodule ExPass.Utils.Validators do
   end
 
   def validate_barcode_format(_), do: {:error, "format must be a string"}
+
+  @doc """
+  Validates the message encoding.
+
+  This function checks if the given value is a valid message encoding.
+  Valid encodings are defined in the @valid_message_encodings module attribute.
+
+  ## Parameters
+
+    * `value` - The message encoding value to validate.
+
+  ## Returns
+
+    * `:ok` if the value is valid.
+    * `{:error, message}` if the value is invalid, where `message` is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_message_encoding("US-ASCII")
+      :ok
+
+      iex> validate_message_encoding("ISO-8859-1")
+      :ok
+
+      iex> validate_message_encoding("InvalidEncoding")
+      {:error, "Invalid message_encoding: InvalidEncoding. Supported encodings are: US-ASCII, ISO-8859-1, ISO-8859-2, ISO-8859-3, ISO-8859-4, ISO-8859-5, ISO-8859-6, ISO-8859-7, ISO-8859-8, ISO-8859-9, ISO-8859-10, Shift_JIS, EUC-JP, ISO-2022-KR, EUC-KR, ISO-2022-JP, ISO-2022-JP-2, ISO-8859-6-E, ISO-8859-6-I, ISO-8859-8-E, ISO-8859-8-I, GB2312, Big5, KOI8-R"}
+
+      iex> validate_message_encoding(nil)
+      {:error, "message_encoding is required"}
+
+  """
+  @spec validate_message_encoding(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_message_encoding(nil), do: {:error, "message_encoding is required"}
+
+  def validate_message_encoding(value) when is_binary(value) do
+    validate_inclusion(value, @valid_message_encodings, "message_encoding")
+  end
+
+  def validate_message_encoding(_), do: {:error, "message_encoding must be a string"}
 
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
