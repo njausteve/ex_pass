@@ -5,47 +5,73 @@ defmodule ExPass.Structs.BeaconsTest do
   alias ExPass.Structs.Beacons
 
   describe "new/0" do
-    test "creates a valid Beacons struct with default arguments" do
-      beacons = Beacons.new()
-      assert %Beacons{major: nil} = beacons
+    test "creates an empty Beacons struct" do
+      assert %Beacons{} = beacon = Beacons.new()
+      assert beacon.major == nil
+      assert beacon.minor == nil
+      assert Jason.encode!(beacon) == "{}"
     end
   end
 
-  describe "major field" do
-    test "accepts valid major values" do
-      assert %Beacons{major: 0} = Beacons.new(%{major: 0})
-      assert %Beacons{major: 32_768} = Beacons.new(%{major: 32_768})
-      assert %Beacons{major: 65_535} = Beacons.new(%{major: 65_535})
+  describe "new/1 with minor field" do
+    test "creates a valid Beacons struct with minor field" do
+      params = %{minor: 50}
+
+      assert %Beacons{} = beacon = Beacons.new(params)
+      assert beacon.minor == params.minor
+      assert beacon.major == nil
+      assert Jason.encode!(beacon) == "{\"minor\":50}"
     end
 
-    test "raises ArgumentError for invalid major values" do
-      assert_raise ArgumentError,
-                   "Invalid major: must be a 16-bit unsigned integer (0-65_535)",
-                   fn ->
-                     Beacons.new(%{major: 70_000})
-                   end
+    test "creates a valid Beacons struct with minor field set to 0" do
+      params = %{minor: 0}
 
-      assert_raise ArgumentError,
-                   "Invalid major: must be a 16-bit unsigned integer (0-65_535)",
-                   fn ->
-                     Beacons.new(%{major: -1})
-                   end
-
-      assert_raise ArgumentError,
-                   "Invalid major: must be a 16-bit unsigned integer (0-65_535)",
-                   fn ->
-                     Beacons.new(%{major: "invalid"})
-                   end
+      assert %Beacons{} = beacon = Beacons.new(params)
+      assert beacon.minor == 0
+      assert Jason.encode!(beacon) == "{\"minor\":0}"
     end
 
-    test "encodes to JSON with valid major values" do
-      assert Jason.encode!(Beacons.new(%{major: 0})) == ~s({"major":0})
-      assert Jason.encode!(Beacons.new(%{major: 12_345})) == ~s({"major":12345})
-      assert Jason.encode!(Beacons.new(%{major: 65_535})) == ~s({"major":65535})
+    test "creates a valid Beacons struct with minor field set to 65535 (max value)" do
+      params = %{minor: 65535}
+
+      assert %Beacons{} = beacon = Beacons.new(params)
+      assert beacon.minor == 65535
+      assert Jason.encode!(beacon) == "{\"minor\":65535}"
     end
 
-    test "encodes to JSON without major" do
-      assert Jason.encode!(Beacons.new(%{})) == ~s({})
+    test "returns error for invalid minor (negative value)" do
+      params = %{minor: -1}
+
+      assert_raise ArgumentError, "minor must be a 16-bit unsigned integer (0-65_535)", fn ->
+        Beacons.new(params)
+      end
+    end
+
+    test "returns error for invalid minor (value too large)" do
+      params = %{minor: 65536}
+
+      assert_raise ArgumentError, "minor must be a 16-bit unsigned integer (0-65_535)", fn ->
+        Beacons.new(params)
+      end
+    end
+
+    test "returns error for invalid minor (non-integer value)" do
+      params = %{minor: "50"}
+
+      assert_raise ArgumentError, "minor must be a 16-bit unsigned integer (0-65_535)", fn ->
+        Beacons.new(params)
+      end
+    end
+  end
+
+  describe "new/1 with major field" do
+    test "creates a valid Beacons struct with major field" do
+      params = %{major: 100}
+
+      assert %Beacons{} = beacon = Beacons.new(params)
+      assert beacon.major == params.major
+      assert beacon.minor == nil
+      assert Jason.encode!(beacon) == "{\"major\":100}"
     end
   end
 end
