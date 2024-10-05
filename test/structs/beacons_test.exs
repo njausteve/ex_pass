@@ -14,25 +14,25 @@ defmodule ExPass.Structs.BeaconsTest do
   describe "major field" do
     test "accepts valid major values" do
       assert %Beacons{major: 0} = Beacons.new(%{major: 0})
-      assert %Beacons{major: 32768} = Beacons.new(%{major: 32768})
-      assert %Beacons{major: 65535} = Beacons.new(%{major: 65535})
+      assert %Beacons{major: 32_768} = Beacons.new(%{major: 32_768})
+      assert %Beacons{major: 65_535} = Beacons.new(%{major: 65_535})
     end
 
     test "raises ArgumentError for invalid major values" do
       assert_raise ArgumentError,
-                   "Invalid major: must be a 16-bit unsigned integer (0-65535)",
+                   "Invalid major: must be a 16-bit unsigned integer (0-65_535)",
                    fn ->
-                     Beacons.new(%{major: 70000})
+                     Beacons.new(%{major: 70_000})
                    end
 
       assert_raise ArgumentError,
-                   "Invalid major: must be a 16-bit unsigned integer (0-65535)",
+                   "Invalid major: must be a 16-bit unsigned integer (0-65_535)",
                    fn ->
                      Beacons.new(%{major: -1})
                    end
 
       assert_raise ArgumentError,
-                   "Invalid major: must be a 16-bit unsigned integer (0-65535)",
+                   "Invalid major: must be a 16-bit unsigned integer (0-65_535)",
                    fn ->
                      Beacons.new(%{major: "invalid"})
                    end
@@ -40,8 +40,8 @@ defmodule ExPass.Structs.BeaconsTest do
 
     test "encodes to JSON with valid major values" do
       assert Jason.encode!(Beacons.new(%{major: 0})) == ~s({"major":0})
-      assert Jason.encode!(Beacons.new(%{major: 12345})) == ~s({"major":12345})
-      assert Jason.encode!(Beacons.new(%{major: 65535})) == ~s({"major":65535})
+      assert Jason.encode!(Beacons.new(%{major: 12_345})) == ~s({"major":12345})
+      assert Jason.encode!(Beacons.new(%{major: 65_535})) == ~s({"major":65535})
     end
 
     test "encodes to JSON without major" do

@@ -35,8 +35,8 @@ defmodule ExPass.Structs.Beacons do
 
   ## Examples
 
-      iex> Beacons.new(%{major: 12345})
-      %Beacons{major: 12345}
+      iex> Beacons.new(%{major: 12_345})
+      %Beacons{major: 12_345}
 
       iex> Beacons.new(%{})
       %Beacons{major: nil}

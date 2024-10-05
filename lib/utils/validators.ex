@@ -808,24 +808,24 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_optional_16bit_unsigned_integer(70000)
-      {:error, "must be a 16-bit unsigned integer (0-65535)"}
+      {:error, "must be a 16-bit unsigned integer (0-65_535)"}
 
       iex> validate_optional_16bit_unsigned_integer(-1)
-      {:error, "must be a 16-bit unsigned integer (0-65535)"}
+      {:error, "must be a 16-bit unsigned integer (0-65_535)"}
 
       iex> validate_optional_16bit_unsigned_integer("invalid")
-      {:error, "must be a 16-bit unsigned integer (0-65535)"}
+      {:error, "must be a 16-bit unsigned integer (0-65_535)"}
 
   """
   @spec validate_optional_16bit_unsigned_integer(term()) :: :ok | {:error, String.t()}
   def validate_optional_16bit_unsigned_integer(nil), do: :ok
 
   def validate_optional_16bit_unsigned_integer(value)
-      when is_integer(value) and value >= 0 and value <= 65535,
+      when is_integer(value) and value >= 0 and value <= 65_535,
       do: :ok
 
   def validate_optional_16bit_unsigned_integer(_),
-    do: {:error, "must be a 16-bit unsigned integer (0-65535)"}
+    do: {:error, "must be a 16-bit unsigned integer (0-65_535)"}
 
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
