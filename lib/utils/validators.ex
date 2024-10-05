@@ -790,6 +790,43 @@ defmodule ExPass.Utils.Validators do
 
   def validate_message_encoding(_), do: {:error, "message_encoding must be a string"}
 
+  @doc """
+  Validates that the given value is a 16-bit unsigned integer (0-65535) or nil.
+
+  ## Examples
+
+      iex> validate_optional_16bit_unsigned_integer(12345)
+      :ok
+
+      iex> validate_optional_16bit_unsigned_integer(0)
+      :ok
+
+      iex> validate_optional_16bit_unsigned_integer(65535)
+      :ok
+
+      iex> validate_optional_16bit_unsigned_integer(nil)
+      :ok
+
+      iex> validate_optional_16bit_unsigned_integer(70000)
+      {:error, "must be a 16-bit unsigned integer (0-65535)"}
+
+      iex> validate_optional_16bit_unsigned_integer(-1)
+      {:error, "must be a 16-bit unsigned integer (0-65535)"}
+
+      iex> validate_optional_16bit_unsigned_integer("invalid")
+      {:error, "must be a 16-bit unsigned integer (0-65535)"}
+
+  """
+  @spec validate_optional_16bit_unsigned_integer(term()) :: :ok | {:error, String.t()}
+  def validate_optional_16bit_unsigned_integer(nil), do: :ok
+
+  def validate_optional_16bit_unsigned_integer(value)
+      when is_integer(value) and value >= 0 and value <= 65535,
+      do: :ok
+
+  def validate_optional_16bit_unsigned_integer(_),
+    do: {:error, "must be a 16-bit unsigned integer (0-65535)"}
+
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
       :ok
