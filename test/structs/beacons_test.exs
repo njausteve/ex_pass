@@ -32,10 +32,10 @@ defmodule ExPass.Structs.BeaconsTest do
     end
 
     test "creates a valid Beacons struct with minor field set to 65535 (max value)" do
-      params = %{minor: 65535}
+      params = %{minor: 65_535}
 
       assert %Beacons{} = beacon = Beacons.new(params)
-      assert beacon.minor == 65535
+      assert beacon.minor == 65_535
       assert Jason.encode!(beacon) == "{\"minor\":65535}"
     end
 
@@ -48,7 +48,7 @@ defmodule ExPass.Structs.BeaconsTest do
     end
 
     test "returns error for invalid minor (value too large)" do
-      params = %{minor: 65536}
+      params = %{minor: 65_536}
 
       assert_raise ArgumentError, "minor must be a 16-bit unsigned integer (0-65_535)", fn ->
         Beacons.new(params)
