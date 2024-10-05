@@ -7,8 +7,8 @@ defmodule ExPass.Structs.FieldContentTest do
   doctest FieldContent
 
   describe "new/1" do
-    test "creates a new FieldContent with default empty map" do
-      assert_raise ArgumentError, ~r/The :key field is required/, fn ->
+    test "new/1 raises ArgumentError when called with no arguments" do
+      assert_raise ArgumentError, "key is a required field and must be a non-empty string", fn ->
         FieldContent.new()
       end
     end
@@ -19,9 +19,15 @@ defmodule ExPass.Structs.FieldContentTest do
     end
 
     test "raises ArgumentError for invalid attributes" do
-      assert_raise ArgumentError, ~r/Invalid data_detector_types/, fn ->
-        FieldContent.new(%{key: "test", value: "test", data_detector_types: ["InvalidType"]})
-      end
+      assert_raise ArgumentError,
+                   "Invalid data detector type: InvalidType. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent",
+                   fn ->
+                     FieldContent.new(%{
+                       key: "test",
+                       value: "test",
+                       data_detector_types: ["InvalidType"]
+                     })
+                   end
     end
   end
 
