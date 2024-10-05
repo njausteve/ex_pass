@@ -65,11 +65,11 @@ defmodule ExPass.Structs.FieldContent do
 
   - `time_style`: The style of the time to display in the field. Used in conjunction with `date_style` for formatting date-time values.
      Supported values are:
-     * "PKTimeStyleNone"
-     * "PKTimeStyleShort"
-     * "PKTimeStyleMedium"
-     * "PKTimeStyleLong"
-     * "PKTimeStyleFull"
+     * "PKDateStyleNone"
+     * "PKDateStyleShort"
+     * "PKDateStyleMedium"
+     * "PKDateStyleLong"
+     * "PKDateStyleFull"
 
   - `value`: The value to use for the field. This can be a localizable string, ISO 8601 date, or number.
      This field is required. A date or time value must include a time zone.
@@ -160,11 +160,11 @@ defmodule ExPass.Structs.FieldContent do
 
   Optional. Used in conjunction with date_style for formatting date-time values.
   Valid values are:
-  - "PKTimeStyleNone"
-  - "PKTimeStyleShort"
-  - "PKTimeStyleMedium"
-  - "PKTimeStyleLong"
-  - "PKTimeStyleFull"
+  - "PKDateStyleNone"
+  - "PKDateStyleShort"
+  - "PKDateStyleMedium"
+  - "PKDateStyleLong"
+  - "PKDateStyleFull"
   """
   @type time_style() :: String.t()
 
