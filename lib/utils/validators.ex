@@ -221,6 +221,13 @@ defmodule ExPass.Utils.Validators do
     "PKTextAlignmentNatural"
   ]
 
+  @valid_barcode_formats [
+    "PKBarcodeFormatQR",
+    "PKBarcodeFormatPDF417",
+    "PKBarcodeFormatAztec",
+    "PKBarcodeFormatCode128"
+  ]
+
   @doc """
   Validates the type of the attributed value.
 
@@ -677,6 +684,45 @@ defmodule ExPass.Utils.Validators do
 
   def validate_text_alignment(_),
     do: {:error, "text_alignment must be a string"}
+
+  @doc """
+  Validates the barcode format.
+
+  This function checks if the given value is a valid barcode format.
+  Valid formats are "PKBarcodeFormatQR", "PKBarcodeFormatPDF417", "PKBarcodeFormatAztec", and "PKBarcodeFormatCode128".
+
+  ## Parameters
+
+    * `value` - The barcode format value to validate.
+
+  ## Returns
+
+    * `:ok` if the value is valid.
+    * `{:error, message}` if the value is invalid, where `message` is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_barcode_format("PKBarcodeFormatQR")
+      :ok
+
+      iex> validate_barcode_format("PKBarcodeFormatPDF417")
+      :ok
+
+      iex> validate_barcode_format("InvalidFormat")
+      {:error, "Invalid format: InvalidFormat. Supported formats are: PKBarcodeFormatQR, PKBarcodeFormatPDF417, PKBarcodeFormatAztec, PKBarcodeFormatCode128"}
+
+      iex> validate_barcode_format(nil)
+      {:error, "format is required"}
+
+  """
+  @spec validate_barcode_format(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_barcode_format(nil), do: {:error, "format is required"}
+
+  def validate_barcode_format(value) when is_binary(value) do
+    validate_inclusion(value, @valid_barcode_formats, "format")
+  end
+
+  def validate_barcode_format(_), do: {:error, "format must be a string"}
 
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do

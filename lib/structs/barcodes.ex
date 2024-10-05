@@ -10,6 +10,8 @@ defmodule ExPass.Structs.Barcodes do
   ## Attributes
 
   - `alt_text`: Optional. Text displayed near the barcode. For example, a human-readable version of the barcode data.
+  - `format`: Required. The format of the barcode. Possible values are: PKBarcodeFormatQR, PKBarcodeFormatPDF417, PKBarcodeFormatAztec, PKBarcodeFormatCode128.
+    Note: The barcode format PKBarcodeFormatCode128 isn't supported for watchOS.
   """
 
   use TypedStruct
@@ -19,6 +21,7 @@ defmodule ExPass.Structs.Barcodes do
 
   typedstruct do
     field :alt_text, String.t()
+    field :format, String.t(), enforce: true
   end
 
   @doc """
@@ -34,8 +37,8 @@ defmodule ExPass.Structs.Barcodes do
 
   ## Examples
 
-      iex> Barcodes.new(%{alt_text: "Scan this QR code"})
-      %Barcodes{alt_text: "Scan this QR code"}
+      iex> Barcodes.new(%{alt_text: "Scan this QR code", format: "PKBarcodeFormatQR"})
+      %Barcodes{alt_text: "Scan this QR code", format: "PKBarcodeFormatQR"}
 
   """
   @spec new(map()) :: %__MODULE__{}
@@ -44,6 +47,7 @@ defmodule ExPass.Structs.Barcodes do
       attrs
       |> Converter.trim_string_values()
       |> validate(:alt_text, &Validators.validate_optional_string(&1, :alt_text))
+      |> validate(:format, &Validators.validate_barcode_format/1)
 
     struct!(__MODULE__, attrs)
   end
