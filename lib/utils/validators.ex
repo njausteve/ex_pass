@@ -33,6 +33,13 @@ defmodule ExPass.Utils.Validators do
     "PKNumberStyleSpellOut"
   ]
 
+  @valid_text_alignments [
+    "PKTextAlignmentLeft",
+    "PKTextAlignmentCenter",
+    "PKTextAlignmentRight",
+    "PKTextAlignmentNatural"
+  ]
+
   @doc """
   Validates the type of the attributed value.
 
@@ -487,6 +494,51 @@ defmodule ExPass.Utils.Validators do
 
   def validate_required_value(_value, field_name),
     do: {:error, "#{field_name} must be a string, number, DateTime, or Date"}
+
+  @doc """
+  Validates the text alignment value.
+
+  This function checks if the given value is a valid text alignment option.
+  Valid options are "PKTextAlignmentLeft", "PKTextAlignmentCenter", "PKTextAlignmentRight", and "PKTextAlignmentNatural".
+
+  ## Parameters
+
+    * `value` - The text alignment value to validate.
+
+  ## Returns
+
+    * `:ok` if the value is valid.
+    * `{:error, message}` if the value is invalid, where `message` is a string explaining the error.
+
+  ## Examples
+
+      iex> validate_text_alignment("PKTextAlignmentLeft")
+      :ok
+
+      iex> validate_text_alignment("PKTextAlignmentCenter")
+      :ok
+
+      iex> validate_text_alignment("PKTextAlignmentRight")
+      :ok
+
+      iex> validate_text_alignment("PKTextAlignmentNatural")
+      :ok
+
+      iex> validate_text_alignment("InvalidAlignment")
+      {:error, "Invalid text_alignment. Supported values are PKTextAlignmentLeft, PKTextAlignmentCenter, PKTextAlignmentRight, PKTextAlignmentNatural"}
+
+      iex> validate_text_alignment(nil)
+      :ok
+
+  """
+  @spec validate_text_alignment(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_text_alignment(nil), do: :ok
+  def validate_text_alignment(value) when value in @valid_text_alignments, do: :ok
+
+  def validate_text_alignment(_),
+    do:
+      {:error,
+       "Invalid text_alignment. Supported values are #{Enum.join(@valid_text_alignments, ", ")}"}
 
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags

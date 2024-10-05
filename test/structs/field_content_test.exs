@@ -6,6 +6,25 @@ defmodule ExPass.Structs.FieldContentTest do
 
   doctest FieldContent
 
+  describe "new/1" do
+    test "creates a new FieldContent with default empty map" do
+      assert_raise ArgumentError, ~r/The :key field is required/, fn ->
+        FieldContent.new()
+      end
+    end
+
+    test "creates a new FieldContent with minimum required fields" do
+      field_content = FieldContent.new(%{key: "test_key", value: "test_value"})
+      assert %FieldContent{key: "test_key", value: "test_value"} = field_content
+    end
+
+    test "raises ArgumentError for invalid attributes" do
+      assert_raise ArgumentError, ~r/Invalid data_detector_types/, fn ->
+        FieldContent.new(%{key: "test", value: "test", data_detector_types: ["InvalidType"]})
+      end
+    end
+  end
+
   describe "change_message" do
     test "new/1 raises ArgumentError for invalid change_message without '%@' placeholder" do
       message = "Balance updated"
@@ -45,6 +64,24 @@ defmodule ExPass.Structs.FieldContentTest do
       assert encoded =~ ~s("key":"test_key")
       assert encoded =~ ~s("value":"test_value")
       assert encoded =~ ~s("changeMessage":"Trimmed message %@")
+    end
+
+    test "validate_change_message/1 returns error for invalid change_message" do
+      invalid_message = "Invalid message without placeholder"
+
+      assert {:error,
+              "The change_message must be a string containing the '%@' placeholder for the new value."} ==
+               ExPass.Utils.Validators.validate_change_message(invalid_message)
+    end
+
+    test "validate_change_message/1 returns error when change_message is not a string" do
+      invalid_types = [42, :atom, [], %{}]
+
+      for invalid_type <- invalid_types do
+        assert {:error,
+                "The change_message must be a string containing the '%@' placeholder for the new value."} ==
+                 ExPass.Utils.Validators.validate_change_message(invalid_type)
+      end
     end
   end
 
@@ -547,6 +584,16 @@ defmodule ExPass.Structs.FieldContentTest do
         assert encoded =~ ~s("numberStyle":"#{style}")
       end)
     end
+
+    test "new/1 raises ArgumentError when number_style is not a string" do
+      assert_raise ArgumentError, ~r/number_style must be a string/, fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "test_value",
+          number_style: :PKNumberStyleDecimal
+        })
+      end
+    end
   end
 
   describe "value" do
@@ -588,6 +635,48 @@ defmodule ExPass.Structs.FieldContentTest do
       assert_raise ArgumentError, ~r/Date value must include a time zone/, fn ->
         FieldContent.new(%{key: "test_key", value: "2023-04-15T14:30:00"})
       end
+    end
+  end
+
+  describe "text_alignment" do
+    test "new/1 creates a valid FieldContent struct with text_alignment" do
+      alignments = [
+        "PKTextAlignmentLeft",
+        "PKTextAlignmentCenter",
+        "PKTextAlignmentRight",
+        "PKTextAlignmentNatural"
+      ]
+
+      Enum.each(alignments, fn alignment ->
+        result =
+          FieldContent.new(%{key: "test_key", value: "test_value", text_alignment: alignment})
+
+        assert %FieldContent{key: "test_key", value: "test_value", text_alignment: ^alignment} =
+                 result
+
+        encoded = Jason.encode!(result)
+        assert encoded =~ ~s("key":"test_key")
+        assert encoded =~ ~s("value":"test_value")
+        assert encoded =~ ~s("textAlignment":"#{alignment}")
+      end)
+    end
+
+    test "new/1 raises ArgumentError for invalid text_alignment" do
+      assert_raise ArgumentError, ~r/Invalid text_alignment/, fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "test_value",
+          text_alignment: "InvalidAlignment"
+        })
+      end
+    end
+
+    test "new/1 allows text_alignment to be nil" do
+      result = FieldContent.new(%{key: "test_key", value: "test_value", text_alignment: nil})
+
+      assert %FieldContent{key: "test_key", value: "test_value", text_alignment: nil} = result
+      encoded = Jason.encode!(result)
+      refute encoded =~ "textAlignment"
     end
   end
 end
