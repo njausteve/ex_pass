@@ -63,6 +63,14 @@ defmodule ExPass.Structs.FieldContent do
      * "PKTextAlignmentRight"
      * "PKTextAlignmentNatural"
 
+  - `time_style`: The style of the time to display in the field. Used in conjunction with `date_style` for formatting date-time values.
+     Supported values are:
+     * "PKDateStyleNone"
+     * "PKDateStyleShort"
+     * "PKDateStyleMedium"
+     * "PKDateStyleLong"
+     * "PKDateStyleFull"
+
   - `value`: The value to use for the field. This can be a localizable string, ISO 8601 date, or number.
      This field is required. A date or time value must include a time zone.
   """
@@ -148,6 +156,19 @@ defmodule ExPass.Structs.FieldContent do
   @type text_alignment() :: String.t()
 
   @typedoc """
+  The style of the time to display in the field.
+
+  Optional. Used in conjunction with date_style for formatting date-time values.
+  Valid values are:
+  - "PKDateStyleNone"
+  - "PKDateStyleShort"
+  - "PKDateStyleMedium"
+  - "PKDateStyleLong"
+  - "PKDateStyleFull"
+  """
+  @type time_style() :: String.t()
+
+  @typedoc """
   The value to use for the field.
 
   Required. Can be:
@@ -171,6 +192,7 @@ defmodule ExPass.Structs.FieldContent do
     field :label, String.t(), default: nil
     field :number_style, number_style(), default: nil
     field :text_alignment, text_alignment(), default: nil
+    field :time_style, time_style(), default: nil
     field :value, value(), enforce: true
   end
 
@@ -190,6 +212,7 @@ defmodule ExPass.Structs.FieldContent do
   • label
   • number_style
   • text_alignment
+  • time_style
   • value
 
   ## Parameters
@@ -207,22 +230,22 @@ defmodule ExPass.Structs.FieldContent do
   ## Examples
 
       iex> FieldContent.new(%{key: "field1", value: "Hello, World!"})
-      %FieldContent{key: "field1", attributed_value: nil, change_message: nil, currency_code: nil, data_detector_types: nil, date_style: nil, ignores_time_zone: nil, is_relative: nil, label: nil, number_style: nil, text_alignment: nil, value: "Hello, World!"}
+      %FieldContent{key: "field1", attributed_value: nil, change_message: nil, currency_code: nil, data_detector_types: nil, date_style: nil, ignores_time_zone: nil, is_relative: nil, label: nil, number_style: nil, text_alignment: nil, time_style: nil, value: "Hello, World!"}
 
       iex> FieldContent.new(%{key: "field2", value: 42, data_detector_types: ["PKDataDetectorTypePhoneNumber"], date_style: "PKDateStyleShort", ignores_time_zone: true, is_relative: false, number_style: "PKNumberStyleDecimal", text_alignment: "PKTextAlignmentCenter"})
-      %FieldContent{key: "field2", attributed_value: nil, change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypePhoneNumber"], date_style: "PKDateStyleShort", ignores_time_zone: true, is_relative: false, label: nil, number_style: "PKNumberStyleDecimal", text_alignment: "PKTextAlignmentCenter", value: 42}
+      %FieldContent{key: "field2", attributed_value: nil, change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypePhoneNumber"], date_style: "PKDateStyleShort", ignores_time_zone: true, is_relative: false, label: nil, number_style: "PKNumberStyleDecimal", text_alignment: "PKTextAlignmentCenter", time_style: nil, value: 42}
 
       iex> datetime = ~U[2023-04-15 14:30:00Z]
-      iex> field_content = FieldContent.new(%{key: "field3", value: datetime, currency_code: "USD", date_style: "PKDateStyleLong", ignores_time_zone: true, is_relative: true, text_alignment: "PKTextAlignmentRight"})
-      iex> %FieldContent{key: "field3", value: ^datetime, currency_code: "USD", date_style: "PKDateStyleLong", ignores_time_zone: true, is_relative: true, text_alignment: "PKTextAlignmentRight"} = field_content
+      iex> field_content = FieldContent.new(%{key: "field3", value: datetime, currency_code: "USD", date_style: "PKDateStyleLong", time_style: "PKDateStyleMedium", ignores_time_zone: true, is_relative: true, text_alignment: "PKTextAlignmentRight"})
+      iex> %FieldContent{key: "field3", value: ^datetime, currency_code: "USD", date_style: "PKDateStyleLong", time_style: "PKDateStyleMedium", ignores_time_zone: true, is_relative: true, text_alignment: "PKTextAlignmentRight"} = field_content
       iex> field_content.change_message
       nil
 
       iex> FieldContent.new(%{key: "field4", value: "<a href='http://example.com'>Click here</a>", data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull", is_relative: false, number_style: "PKNumberStylePercent", text_alignment: "PKTextAlignmentLeft"})
-      %FieldContent{key: "field4", attributed_value: nil, change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull", ignores_time_zone: nil, is_relative: false, label: nil, number_style: "PKNumberStylePercent", text_alignment: "PKTextAlignmentLeft", value: "<a href='http://example.com'>Click here</a>"}
+      %FieldContent{key: "field4", attributed_value: nil, change_message: nil, currency_code: nil, data_detector_types: ["PKDataDetectorTypeLink"], date_style: "PKDateStyleFull", ignores_time_zone: nil, is_relative: false, label: nil, number_style: "PKNumberStylePercent", text_alignment: "PKTextAlignmentLeft", time_style: nil, value: "<a href='http://example.com'>Click here</a>"}
 
       iex> FieldContent.new(%{key: "field5", value: "No detectors", data_detector_types: [], change_message: "Updated to %@", ignores_time_zone: true, is_relative: true, label: "Field Label", number_style: "PKNumberStyleScientific", text_alignment: "PKTextAlignmentNatural"})
-      %FieldContent{key: "field5", attributed_value: nil, change_message: "Updated to %@", currency_code: nil, data_detector_types: [], date_style: nil, ignores_time_zone: true, is_relative: true, label: "Field Label", number_style: "PKNumberStyleScientific", text_alignment: "PKTextAlignmentNatural", value: "No detectors"}
+      %FieldContent{key: "field5", attributed_value: nil, change_message: "Updated to %@", currency_code: nil, data_detector_types: [], date_style: nil, ignores_time_zone: true, is_relative: true, label: "Field Label", number_style: "PKNumberStyleScientific", text_alignment: "PKTextAlignmentNatural", time_style: nil, value: "No detectors"}
   """
   @spec new(map()) :: %__MODULE__{}
   def new(attrs \\ %{}) do
@@ -233,13 +256,14 @@ defmodule ExPass.Structs.FieldContent do
       |> validate(:change_message, &Validators.validate_change_message/1)
       |> validate(:currency_code, &Validators.validate_currency_code/1)
       |> validate(:data_detector_types, &Validators.validate_data_detector_types/1)
-      |> validate(:date_style, &Validators.validate_date_style/1)
+      |> validate(:date_style, &Validators.validate_date_style(&1, :date_style))
       |> validate(:ignores_time_zone, &Validators.validate_boolean_field(&1, :ignores_time_zone))
       |> validate(:is_relative, &Validators.validate_boolean_field(&1, :is_relative))
       |> validate(:key, &Validators.validate_required_string(&1, :key))
       |> validate(:label, &Validators.validate_optional_string(&1, :label))
       |> validate(:number_style, &Validators.validate_number_style/1)
       |> validate(:text_alignment, &Validators.validate_text_alignment/1)
+      |> validate(:time_style, &Validators.validate_date_style(&1, :time_style))
       |> validate(:value, &Validators.validate_required_value(&1, :value))
 
     struct!(__MODULE__, attrs)

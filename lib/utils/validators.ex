@@ -9,7 +9,188 @@ defmodule ExPass.Utils.Validators do
   These validators are primarily used internally by other ExPass modules.
   """
 
-  @currency_code_regex ~r/^(AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|BOB|BOV|BRL|BSD|BTN|BWP|BYN|BZD|CAD|CDF|CHE|CHF|CHW|CLF|CLP|CNY|COP|COU|CRC|CUP|CVE|CZK|DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|HKD|HNL|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|MRU|MUR|MVR|MWK|MXN|MXV|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SOS|SRD|SSP|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|USN|UYI|UYU|UYW|UZS|VED|VES|VND|VUV|WST|XAF|XAG|XAU|XBA|XBB|XBC|XBD|XCD|XDR|XOF|XPD|XPF|XPT|XSU|XTS|XUA|XXX|YER|ZAR|ZMW|ZWG|ZWL)$/
+  @currency_codes [
+    "AED",
+    "AFN",
+    "ALL",
+    "AMD",
+    "ANG",
+    "AOA",
+    "ARS",
+    "AUD",
+    "AWG",
+    "AZN",
+    "BAM",
+    "BBD",
+    "BDT",
+    "BGN",
+    "BHD",
+    "BIF",
+    "BMD",
+    "BND",
+    "BOB",
+    "BOV",
+    "BRL",
+    "BSD",
+    "BTN",
+    "BWP",
+    "BYN",
+    "BZD",
+    "CAD",
+    "CDF",
+    "CHE",
+    "CHF",
+    "CHW",
+    "CLF",
+    "CLP",
+    "CNY",
+    "COP",
+    "COU",
+    "CRC",
+    "CUP",
+    "CVE",
+    "CZK",
+    "DJF",
+    "DKK",
+    "DOP",
+    "DZD",
+    "EGP",
+    "ERN",
+    "ETB",
+    "EUR",
+    "FJD",
+    "FKP",
+    "GBP",
+    "GEL",
+    "GHS",
+    "GIP",
+    "GMD",
+    "GNF",
+    "GTQ",
+    "GYD",
+    "HKD",
+    "HNL",
+    "HTG",
+    "HUF",
+    "IDR",
+    "ILS",
+    "INR",
+    "IQD",
+    "IRR",
+    "ISK",
+    "JMD",
+    "JOD",
+    "JPY",
+    "KES",
+    "KGS",
+    "KHR",
+    "KMF",
+    "KPW",
+    "KRW",
+    "KWD",
+    "KYD",
+    "KZT",
+    "LAK",
+    "LBP",
+    "LKR",
+    "LRD",
+    "LSL",
+    "LYD",
+    "MAD",
+    "MDL",
+    "MGA",
+    "MKD",
+    "MMK",
+    "MNT",
+    "MOP",
+    "MRU",
+    "MUR",
+    "MVR",
+    "MWK",
+    "MXN",
+    "MXV",
+    "MYR",
+    "MZN",
+    "NAD",
+    "NGN",
+    "NIO",
+    "NOK",
+    "NPR",
+    "NZD",
+    "OMR",
+    "PAB",
+    "PEN",
+    "PGK",
+    "PHP",
+    "PKR",
+    "PLN",
+    "PYG",
+    "QAR",
+    "RON",
+    "RSD",
+    "RUB",
+    "RWF",
+    "SAR",
+    "SBD",
+    "SCR",
+    "SDG",
+    "SEK",
+    "SGD",
+    "SHP",
+    "SLE",
+    "SOS",
+    "SRD",
+    "SSP",
+    "STN",
+    "SVC",
+    "SYP",
+    "SZL",
+    "THB",
+    "TJS",
+    "TMT",
+    "TND",
+    "TOP",
+    "TRY",
+    "TTD",
+    "TWD",
+    "TZS",
+    "UAH",
+    "UGX",
+    "USD",
+    "USN",
+    "UYI",
+    "UYU",
+    "UYW",
+    "UZS",
+    "VED",
+    "VES",
+    "VND",
+    "VUV",
+    "WST",
+    "XAF",
+    "XAG",
+    "XAU",
+    "XBA",
+    "XBB",
+    "XBC",
+    "XBD",
+    "XCD",
+    "XDR",
+    "XOF",
+    "XPD",
+    "XPF",
+    "XPT",
+    "XSU",
+    "XTS",
+    "XUA",
+    "XXX",
+    "YER",
+    "ZAR",
+    "ZMW",
+    "ZWG",
+    "ZWL"
+  ]
+  @valid_currency_codes MapSet.new(@currency_codes)
 
   @valid_detector_types [
     "PKDataDetectorTypePhoneNumber",
@@ -70,7 +251,7 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_attributed_value(%{})
-      {:error, "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date"}
+      {:error, "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime, and Date"}
 
   """
   @spec validate_attributed_value(String.t() | number() | DateTime.t() | Date.t() | nil) ::
@@ -79,31 +260,21 @@ defmodule ExPass.Utils.Validators do
   def validate_attributed_value(value) when is_number(value), do: :ok
 
   def validate_attributed_value(value) when is_binary(value) do
-    case contains_unsupported_html_tags?(value) do
-      true ->
-        {:error, "Supported types are: String (including <a></a> tag), number, DateTime and Date"}
-
-      false ->
-        :ok
+    if contains_unsupported_html_tags?(value) do
+      {:error,
+       "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime, and Date"}
+    else
+      :ok
     end
   end
 
-  def validate_attributed_value(%DateTime{} = value) do
-    DateTime.to_iso8601(value)
-
-    :ok
-  end
-
-  def validate_attributed_value(%Date{} = value) do
-    Date.to_iso8601(value)
-
-    :ok
-  end
+  def validate_attributed_value(%DateTime{}), do: :ok
+  def validate_attributed_value(%Date{}), do: :ok
 
   def validate_attributed_value(_),
     do:
       {:error,
-       "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date"}
+       "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime, and Date"}
 
   @doc """
   Validates the change_message field.
@@ -179,9 +350,9 @@ defmodule ExPass.Utils.Validators do
   def validate_currency_code(nil), do: :ok
 
   def validate_currency_code(value) when is_binary(value) or is_atom(value) do
-    value_string = if is_atom(value), do: Atom.to_string(value), else: value
+    value_string = to_string(value)
 
-    if Regex.match?(@currency_code_regex, value_string) do
+    if MapSet.member?(@valid_currency_codes, value_string) do
       :ok
     else
       {:error, "Invalid currency code #{value_string}"}
@@ -212,25 +383,18 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_data_detector_types(["InvalidDetector"])
-      {:error, "Invalid data detector type: InvalidDetector. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent"}
+      {:error, "Invalid data_detector_types: InvalidDetector. Supported values are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent"}
 
       iex> validate_data_detector_types("PKDataDetectorTypePhoneNumber")
       {:error, "data_detector_types must be a list"}
 
   """
-  @spec validate_data_detector_types(list(String.t()) | nil) :: :ok | {:error, String.t()}
+  @spec validate_data_detector_types([String.t()] | nil) :: :ok | {:error, String.t()}
   def validate_data_detector_types(nil), do: :ok
   def validate_data_detector_types([]), do: :ok
 
   def validate_data_detector_types(types) when is_list(types) do
-    invalid_types = Enum.reject(types, &(&1 in @valid_detector_types))
-
-    if Enum.empty?(invalid_types) do
-      :ok
-    else
-      {:error,
-       "Invalid data detector type: #{Enum.join(invalid_types, ", ")}. Supported types are: #{Enum.join(@valid_detector_types, ", ")}"}
-    end
+    validate_inclusion_list(types, @valid_detector_types, "data_detector_types")
   end
 
   def validate_data_detector_types(_), do: {:error, "data_detector_types must be a list"}
@@ -240,6 +404,11 @@ defmodule ExPass.Utils.Validators do
 
   The date_style must be a valid date style string.
 
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `key` - The key for the date_style field in the map.
+
   ## Returns
 
     * `:ok` if the value is a valid date style string or nil.
@@ -247,32 +416,27 @@ defmodule ExPass.Utils.Validators do
 
   ## Examples
 
-      iex> validate_date_style("PKDateStyleShort")
+      iex> validate_date_style("PKDateStyleShort", :date_style)
       :ok
 
-      iex> validate_date_style(nil)
+      iex> validate_date_style(nil, :date_style)
       :ok
 
-      iex> validate_date_style("InvalidStyle")
+      iex> validate_date_style("InvalidStyle", :date_style)
       {:error, "Invalid date_style: InvalidStyle. Supported values are: PKDateStyleNone, PKDateStyleShort, PKDateStyleMedium, PKDateStyleLong, PKDateStyleFull"}
 
-      iex> validate_date_style(42)
+      iex> validate_date_style(42, :date_style)
       {:error, "date_style must be a string"}
 
   """
-  @spec validate_date_style(String.t() | nil) :: :ok | {:error, String.t()}
-  def validate_date_style(nil), do: :ok
-
-  def validate_date_style(style) when is_binary(style) do
-    if style in @valid_date_styles do
-      :ok
-    else
-      {:error,
-       "Invalid date_style: #{style}. Supported values are: #{Enum.join(@valid_date_styles, ", ")}"}
+  @spec validate_date_style(String.t() | nil, atom()) :: :ok | {:error, String.t()}
+  def validate_date_style(value, key) do
+    case value do
+      nil -> :ok
+      style when is_binary(style) -> validate_inclusion(style, @valid_date_styles, to_string(key))
+      _ -> {:error, "#{key} must be a string"}
     end
   end
-
-  def validate_date_style(_), do: {:error, "date_style must be a string"}
 
   @doc """
   Validates a boolean field.
@@ -332,7 +496,7 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_required_string("", :key)
-      {:error, "key cannot be an empty string"}
+      {:error, "key is a required field and must be a non-empty string"}
 
       iex> validate_required_string(nil, :key)
       {:error, "key is a required field and must be a non-empty string"}
@@ -341,14 +505,8 @@ defmodule ExPass.Utils.Validators do
       {:error, "key is a required field and must be a non-empty string"}
 
   """
-  @spec validate_required_string(String.t() | nil, atom()) :: :ok | {:error, String.t()}
-  def validate_required_string(nil, field_name),
-    do: {:error, "#{field_name} is a required field and must be a non-empty string"}
-
-  def validate_required_string("", field_name),
-    do: {:error, "#{field_name} cannot be an empty string"}
-
-  def validate_required_string(value, _field_name) when is_binary(value), do: :ok
+  @spec validate_required_string(String.t(), atom()) :: :ok | {:error, String.t()}
+  def validate_required_string(value, _field_name) when is_binary(value) and value != "", do: :ok
 
   def validate_required_string(_, field_name),
     do: {:error, "#{field_name} is a required field and must be a non-empty string"}
@@ -384,8 +542,7 @@ defmodule ExPass.Utils.Validators do
 
   """
   @spec validate_optional_string(String.t() | nil, atom()) :: :ok | {:error, String.t()}
-  def validate_optional_string(nil, _field_name), do: :ok
-  def validate_optional_string(value, _field_name) when is_binary(value), do: :ok
+  def validate_optional_string(value, _field_name) when is_binary(value) or is_nil(value), do: :ok
 
   def validate_optional_string(_, field_name),
     do: {:error, "#{field_name} must be a string if provided"}
@@ -418,13 +575,8 @@ defmodule ExPass.Utils.Validators do
   @spec validate_number_style(String.t() | nil) :: :ok | {:error, String.t()}
   def validate_number_style(nil), do: :ok
 
-  def validate_number_style(value) when is_binary(value) do
-    if value in @valid_number_styles do
-      :ok
-    else
-      {:error,
-       "Invalid number_style: #{value}. Supported values are: #{Enum.join(@valid_number_styles, ", ")}"}
-    end
+  def validate_number_style(style) when is_binary(style) do
+    validate_inclusion(style, @valid_number_styles, "number_style")
   end
 
   def validate_number_style(_), do: {:error, "number_style must be a string"}
@@ -459,40 +611,25 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_required_value(nil, :another_field)
-      {:error, "value is a required field and cannot be nil"}
+      {:error, "another_field is a required field and cannot be nil"}
 
       iex> validate_required_value("2023-04-15T14:30:00", :value)
-      {:error, "Date value must include a time zone"}
+      :ok
 
   """
-  @spec validate_required_value(String.t() | number() | DateTime.t() | Date.t() | nil, atom()) ::
+  @spec validate_required_value(String.t() | number() | DateTime.t() | Date.t(), atom()) ::
           :ok | {:error, String.t()}
   def validate_required_value(nil, field_name),
     do: {:error, "#{field_name} is a required field and cannot be nil"}
 
-  def validate_required_value(value, _field_name) when is_binary(value) do
-    if String.contains?(value, "T") and not String.contains?(value, "Z") do
-      {:error, "Date value must include a time zone"}
-    else
-      :ok
-    end
-  end
-
   def validate_required_value(value, _field_name) when is_number(value), do: :ok
 
-  def validate_required_value(%DateTime{} = value, _field_name) do
-    DateTime.to_iso8601(value)
+  def validate_required_value(value, _field_name) when is_binary(value), do: :ok
 
-    :ok
-  end
+  def validate_required_value(%DateTime{}, _field_name), do: :ok
+  def validate_required_value(%Date{}, _field_name), do: :ok
 
-  def validate_required_value(%Date{} = value, _field_name) do
-    Date.to_iso8601(value)
-
-    :ok
-  end
-
-  def validate_required_value(_value, field_name),
+  def validate_required_value(_, field_name),
     do: {:error, "#{field_name} must be a string, number, DateTime, or Date"}
 
   @doc """
@@ -525,7 +662,7 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_text_alignment("InvalidAlignment")
-      {:error, "Invalid text_alignment. Supported values are PKTextAlignmentLeft, PKTextAlignmentCenter, PKTextAlignmentRight, PKTextAlignmentNatural"}
+      {:error, "Invalid text_alignment: InvalidAlignment. Supported values are: PKTextAlignmentLeft, PKTextAlignmentCenter, PKTextAlignmentRight, PKTextAlignmentNatural"}
 
       iex> validate_text_alignment(nil)
       :ok
@@ -533,16 +670,38 @@ defmodule ExPass.Utils.Validators do
   """
   @spec validate_text_alignment(String.t() | nil) :: :ok | {:error, String.t()}
   def validate_text_alignment(nil), do: :ok
-  def validate_text_alignment(value) when value in @valid_text_alignments, do: :ok
+
+  def validate_text_alignment(value) when is_binary(value) do
+    validate_inclusion(value, @valid_text_alignments, "text_alignment")
+  end
 
   def validate_text_alignment(_),
-    do:
+    do: {:error, "text_alignment must be a string"}
+
+  defp validate_inclusion(value, valid_values, field_name) do
+    if value in valid_values do
+      :ok
+    else
       {:error,
-       "Invalid text_alignment. Supported values are #{Enum.join(@valid_text_alignments, ", ")}"}
+       "Invalid #{field_name}: #{value}. Supported values are: #{Enum.join(valid_values, ", ")}"}
+    end
+  end
+
+  defp validate_inclusion_list(values, valid_values, field_name) do
+    invalid_values = Enum.reject(values, &(&1 in valid_values))
+
+    if invalid_values == [] do
+      :ok
+    else
+      {:error,
+       "Invalid #{field_name}: #{Enum.join(invalid_values, ", ")}. Supported values are: #{Enum.join(valid_values, ", ")}"}
+    end
+  end
 
   defp contains_unsupported_html_tags?(string) do
     # Remove all valid anchor tags
-    string_without_anchors = String.replace(string, ~r{<a\s[^>]*>.*?</a>|<a\s[^>]*/>}, "")
+    string_without_anchors =
+      Regex.replace(~r{<a\s[^>]*>.*?</a>|<a\s[^>]*/>}, string, "")
 
     # Check if any HTML tags remain
     Regex.match?(~r{<[^>]+>}, string_without_anchors)

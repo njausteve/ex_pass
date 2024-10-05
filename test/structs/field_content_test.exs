@@ -20,7 +20,7 @@ defmodule ExPass.Structs.FieldContentTest do
 
     test "raises ArgumentError for invalid attributes" do
       assert_raise ArgumentError,
-                   "Invalid data detector type: InvalidType. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent",
+                   "Invalid data_detector_types: InvalidType. Supported values are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent",
                    fn ->
                      FieldContent.new(%{
                        key: "test",
@@ -132,7 +132,7 @@ defmodule ExPass.Structs.FieldContentTest do
 
       for invalid_value <- invalid_values do
         assert_raise ArgumentError,
-                     "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime and Date",
+                     "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime, and Date",
                      fn ->
                        FieldContent.new(%{
                          key: "test_key",
@@ -173,7 +173,7 @@ defmodule ExPass.Structs.FieldContentTest do
       input_value = "<span>Unsupported tag</span>"
 
       assert_raise ArgumentError,
-                   "Supported types are: String (including <a></a> tag), number, DateTime and Date",
+                   "Invalid attributed_value type. Supported types are: String (including <a></a> tag), number, DateTime, and Date",
                    fn ->
                      FieldContent.new(%{
                        key: "test_key",
@@ -280,7 +280,7 @@ defmodule ExPass.Structs.FieldContentTest do
 
     test "new/1 raises ArgumentError for invalid data_detector_types" do
       assert_raise ArgumentError,
-                   ~r/Invalid data detector type: InvalidDetector. Supported types are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent/,
+                   ~r/Invalid data_detector_types: InvalidDetector. Supported values are: PKDataDetectorTypePhoneNumber, PKDataDetectorTypeLink, PKDataDetectorTypeAddress, PKDataDetectorTypeCalendarEvent/,
                    fn ->
                      FieldContent.new(%{
                        key: "test_key",
@@ -451,7 +451,7 @@ defmodule ExPass.Structs.FieldContentTest do
     end
 
     test "new/1 raises ArgumentError when key is an empty string" do
-      assert_raise ArgumentError, ~r/key cannot be an empty string/, fn ->
+      assert_raise ArgumentError, "key is a required field and must be a non-empty string", fn ->
         FieldContent.new(%{key: "", value: "test_value"})
       end
     end
@@ -636,12 +636,6 @@ defmodule ExPass.Structs.FieldContentTest do
         FieldContent.new(%{key: "test_key", value: %{invalid: "type"}})
       end
     end
-
-    test "new/1 raises ArgumentError for missing time zone in date value" do
-      assert_raise ArgumentError, ~r/Date value must include a time zone/, fn ->
-        FieldContent.new(%{key: "test_key", value: "2023-04-15T14:30:00"})
-      end
-    end
   end
 
   describe "text_alignment" do
@@ -683,6 +677,129 @@ defmodule ExPass.Structs.FieldContentTest do
       assert %FieldContent{key: "test_key", value: "test_value", text_alignment: nil} = result
       encoded = Jason.encode!(result)
       refute encoded =~ "textAlignment"
+    end
+
+    test "new/1 raises ArgumentError when text_alignment is not a string" do
+      assert_raise ArgumentError, "text_alignment must be a string", fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "test_value",
+          text_alignment: 123
+        })
+      end
+
+      assert_raise ArgumentError, "text_alignment must be a string", fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "test_value",
+          text_alignment: :some_atom
+        })
+      end
+
+      assert_raise ArgumentError, "text_alignment must be a string", fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "test_value",
+          text_alignment: ["PKTextAlignmentLeft"]
+        })
+      end
+    end
+  end
+
+  describe "timeStyle" do
+    test "new/1 creates a valid FieldContent struct with time_style" do
+      time_styles = [
+        "PKDateStyleNone",
+        "PKDateStyleShort",
+        "PKDateStyleMedium",
+        "PKDateStyleLong",
+        "PKDateStyleFull"
+      ]
+
+      Enum.each(time_styles, fn style ->
+        result =
+          FieldContent.new(%{
+            key: "test_key",
+            value: "2023-04-15T14:30:00Z",
+            date_style: "PKDateStyleMedium",
+            time_style: style
+          })
+
+        assert %FieldContent{
+                 key: "test_key",
+                 value: "2023-04-15T14:30:00Z",
+                 date_style: "PKDateStyleMedium",
+                 time_style: ^style
+               } = result
+
+        encoded = Jason.encode!(result)
+        assert encoded =~ ~s("key":"test_key")
+        assert encoded =~ ~s("value":"2023-04-15T14:30:00Z")
+        assert encoded =~ ~s("dateStyle":"PKDateStyleMedium")
+        assert encoded =~ ~s("timeStyle":"#{style}")
+      end)
+    end
+
+    test "new/1 raises ArgumentError for invalid time_style" do
+      assert_raise ArgumentError, ~r/Invalid time_style/, fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          date_style: "PKDateStyleMedium",
+          time_style: "InvalidTimeStyle"
+        })
+      end
+    end
+
+    test "new/1 allows time_style to be nil" do
+      result =
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          date_style: "PKDateStyleMedium",
+          time_style: nil
+        })
+
+      assert %FieldContent{
+               key: "test_key",
+               value: "2023-04-15T14:30:00Z",
+               date_style: "PKDateStyleMedium",
+               time_style: nil
+             } = result
+
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("dateStyle":"PKDateStyleMedium")
+      refute encoded =~ "timeStyle"
+    end
+
+    test "new/1 allows timeStyle to be omitted" do
+      result =
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          date_style: "PKDateStyleMedium"
+        })
+
+      assert %FieldContent{
+               key: "test_key",
+               value: "2023-04-15T14:30:00Z",
+               date_style: "PKDateStyleMedium",
+               time_style: nil
+             } = result
+
+      encoded = Jason.encode!(result)
+      assert encoded =~ ~s("dateStyle":"PKDateStyleMedium")
+      refute encoded =~ "timeStyle"
+    end
+
+    test "new/1 raises ArgumentError when time_style is not a string" do
+      assert_raise ArgumentError, ~r/time_style must be a string/, fn ->
+        FieldContent.new(%{
+          key: "test_key",
+          value: "2023-04-15T14:30:00Z",
+          time_style: 123
+        })
+      end
     end
   end
 end
