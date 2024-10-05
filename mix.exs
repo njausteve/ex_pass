@@ -8,7 +8,8 @@ defmodule ExPass.MixProject do
       elixir: "~> 1.16",
       config_path: "./config/config.exs",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      test_coverage: [threshold: 97.56]
     ]
   end
 
