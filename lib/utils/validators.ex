@@ -850,14 +850,17 @@ defmodule ExPass.Utils.Validators do
       :ok
 
       iex> validate_uuid("not-a-uuid")
-      {:error, "proximityUUID must be a valid UUID string"}
+      {:error, "proximity_UUID must be a valid UUID string"}
 
       iex> validate_uuid(nil)
-      {:error, "proximityUUID is required"}
+      {:error, "proximity_UUID is required"}
+
+      iex> validate_uuid(123)
+      {:error, "proximity_UUID must be a valid UUID string"}
 
   """
   @spec validate_uuid(String.t() | nil) :: :ok | {:error, String.t()}
-  def validate_uuid(nil), do: {:error, "proximityUUID is required"}
+  def validate_uuid(nil), do: {:error, "proximity_UUID is required"}
 
   def validate_uuid(value) when is_binary(value) do
     uuid_regex = ~r/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -865,11 +868,11 @@ defmodule ExPass.Utils.Validators do
     if Regex.match?(uuid_regex, value) do
       :ok
     else
-      {:error, "proximityUUID must be a valid UUID string"}
+      {:error, "proximity_UUID must be a valid UUID string"}
     end
   end
 
-  def validate_uuid(_), do: {:error, "proximityUUID must be a valid UUID string"}
+  def validate_uuid(_), do: {:error, "proximity_UUID must be a valid UUID string"}
 
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
