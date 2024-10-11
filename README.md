@@ -41,7 +41,7 @@ end
 |  | `Pass.beacons.relevantText` | [#63](https://github.com/njausteve/ex_pass/issues/63) | ✅ |
 | `Pass.Locations` | `Pass.locations.altitude` | [#89](https://github.com/njausteve/ex_pass/issues/89) | ✅ |
 |  | `Pass.locations.latitude` | [#90](https://github.com/njausteve/ex_pass/issues/90) | ✅ |
-|  | `Pass.locations.longitude` | [#91](https://github.com/njausteve/ex_pass/issues/91) | `todo` |
+|  | `Pass.locations.longitude` | [#91](https://github.com/njausteve/ex_pass/issues/91) | ✅ |
 |  | `Pass.locations.relevantText` | [#92](https://github.com/njausteve/ex_pass/issues/92) | `todo` |
 | `Pass.NFC` | `Pass.nfc.encryptionPublicKey` | [#93](https://github.com/njausteve/ex_pass/issues/93) | `todo` |
 |  | `Pass.nfc.message` | [#94](https://github.com/njausteve/ex_pass/issues/94) | `todo` |
