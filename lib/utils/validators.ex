@@ -793,39 +793,86 @@ defmodule ExPass.Utils.Validators do
   @doc """
   Validates that the given value is a 16-bit unsigned integer (0-65535) or nil.
 
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `field_name` - The name of the field being validated, used in error messages.
+
   ## Examples
 
-      iex> validate_optional_16bit_unsigned_integer(12345)
+      iex> validate_optional_16bit_unsigned_integer(12345, :major)
       :ok
 
-      iex> validate_optional_16bit_unsigned_integer(0)
+      iex> validate_optional_16bit_unsigned_integer(0, :minor)
       :ok
 
-      iex> validate_optional_16bit_unsigned_integer(65535)
+      iex> validate_optional_16bit_unsigned_integer(65535, :major)
       :ok
 
-      iex> validate_optional_16bit_unsigned_integer(nil)
+      iex> validate_optional_16bit_unsigned_integer(nil, :minor)
       :ok
 
-      iex> validate_optional_16bit_unsigned_integer(70000)
-      {:error, "must be a 16-bit unsigned integer (0-65_535)"}
+      iex> validate_optional_16bit_unsigned_integer(70000, :major)
+      {:error, "major must be a 16-bit unsigned integer (0-65_535)"}
 
-      iex> validate_optional_16bit_unsigned_integer(-1)
-      {:error, "must be a 16-bit unsigned integer (0-65_535)"}
+      iex> validate_optional_16bit_unsigned_integer(-1, :minor)
+      {:error, "minor must be a 16-bit unsigned integer (0-65_535)"}
 
-      iex> validate_optional_16bit_unsigned_integer("invalid")
-      {:error, "must be a 16-bit unsigned integer (0-65_535)"}
+      iex> validate_optional_16bit_unsigned_integer("invalid", :major)
+      {:error, "major must be a 16-bit unsigned integer (0-65_535)"}
 
   """
-  @spec validate_optional_16bit_unsigned_integer(term()) :: :ok | {:error, String.t()}
-  def validate_optional_16bit_unsigned_integer(nil), do: :ok
+  @spec validate_optional_16bit_unsigned_integer(term(), atom()) :: :ok | {:error, String.t()}
+  def validate_optional_16bit_unsigned_integer(nil, _field_name), do: :ok
 
-  def validate_optional_16bit_unsigned_integer(value)
+  def validate_optional_16bit_unsigned_integer(value, _field_name)
       when is_integer(value) and value >= 0 and value <= 65_535,
       do: :ok
 
-  def validate_optional_16bit_unsigned_integer(_),
-    do: {:error, "must be a 16-bit unsigned integer (0-65_535)"}
+  def validate_optional_16bit_unsigned_integer(_value, field_name),
+    do: {:error, "#{field_name} must be a 16-bit unsigned integer (0-65_535)"}
+
+  @doc """
+  Validates that the given value is a valid UUID string.
+
+  ## Parameters
+
+    * `value` - The value to validate.
+
+  ## Returns
+
+    * `:ok` if the value is a valid UUID string.
+    * `{:error, message}` if the value is invalid or missing.
+
+  ## Examples
+
+      iex> validate_uuid("E2C56DB5-DFFB-48D2-B060-D0F5A71096E0")
+      :ok
+
+      iex> validate_uuid("not-a-uuid")
+      {:error, "proximity_UUID must be a valid UUID string"}
+
+      iex> validate_uuid(nil)
+      {:error, "proximity_UUID is required"}
+
+      iex> validate_uuid(123)
+      {:error, "proximity_UUID must be a valid UUID string"}
+
+  """
+  @spec validate_uuid(String.t() | nil) :: :ok | {:error, String.t()}
+  def validate_uuid(nil), do: {:error, "proximity_UUID is required"}
+
+  def validate_uuid(value) when is_binary(value) do
+    uuid_regex = ~r/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+    if Regex.match?(uuid_regex, value) do
+      :ok
+    else
+      {:error, "proximity_UUID must be a valid UUID string"}
+    end
+  end
+
+  def validate_uuid(_), do: {:error, "proximity_UUID must be a valid UUID string"}
 
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
