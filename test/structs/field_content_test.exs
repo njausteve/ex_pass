@@ -6,8 +6,8 @@ defmodule ExPass.Structs.FieldContentTest do
 
   doctest FieldContent
 
-  describe "new/1" do
-    test "new/1 raises ArgumentError when called with no arguments" do
+  describe "new/0" do
+    test "new/0 raises ArgumentError when called with no arguments" do
       assert_raise ArgumentError, "key is a required field and must be a non-empty string", fn ->
         FieldContent.new()
       end
