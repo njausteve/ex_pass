@@ -874,6 +874,44 @@ defmodule ExPass.Utils.Validators do
 
   def validate_uuid(_), do: {:error, "proximity_UUID must be a valid UUID string"}
 
+  @doc """
+  Validates that the given value is a float or nil.
+
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `field_name` - The name of the field being validated, used in error messages.
+
+  ## Examples
+
+      iex> validate_optional_float(42.5, :altitude)
+      :ok
+
+      iex> validate_optional_float(0.0, :altitude)
+      :ok
+
+      iex> validate_optional_float(-10.75, :altitude)
+      :ok
+
+      iex> validate_optional_float(nil, :altitude)
+      :ok
+
+      iex> validate_optional_float(42, :altitude)
+      {:error, "altitude must be a float"}
+
+      iex> validate_optional_float("invalid", :altitude)
+      {:error, "altitude must be a float"}
+
+  """
+  @spec validate_optional_float(term(), atom()) :: :ok | {:error, String.t()}
+  def validate_optional_float(nil, _field_name), do: :ok
+  def validate_optional_float(value, _field_name) when is_float(value), do: :ok
+
+  def validate_optional_float(value, field_name) when is_integer(value),
+    do: {:error, "#{field_name} must be a float"}
+
+  def validate_optional_float(_value, field_name), do: {:error, "#{field_name} must be a float"}
+
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
       :ok
