@@ -5,6 +5,7 @@ defmodule ExPass.Structs.Locations do
   ## Fields
 
   * `:altitude` - The altitude, in meters, of the location. This is a double-precision floating-point number.
+  * `:latitude` - (Required) The latitude, in degrees, of the location. This is a double-precision floating-point number between -90 and 90.
 
   ## Compatibility
 
@@ -20,6 +21,7 @@ defmodule ExPass.Structs.Locations do
 
   typedstruct do
     field :altitude, float()
+    field :latitude, float(), enforce: true
   end
 
   @doc """
@@ -27,8 +29,9 @@ defmodule ExPass.Structs.Locations do
 
   ## Parameters
 
-    * `attrs` - A map of attributes for the Locations struct. The map can include the following key:
+    * `attrs` - A map of attributes for the Locations struct. The map can include the following keys:
       * `:altitude` - (Optional) The altitude, in meters, of the location. This should be a double-precision floating-point number.
+      * `:latitude` - (Required) The latitude, in degrees, of the location. This should be a double-precision floating-point number between -90 and 90.
 
   ## Returns
 
@@ -36,17 +39,23 @@ defmodule ExPass.Structs.Locations do
 
   ## Examples
 
-      iex> Locations.new(%{altitude: 100.5})
-      %Locations{altitude: 100.5}
+      iex> Locations.new(%{latitude: 37.7749})
+      %Locations{altitude: nil, latitude: 37.7749}
+
+      iex> Locations.new(%{altitude: 100.5, latitude: 37.7749})
+      %Locations{altitude: 100.5, latitude: 37.7749}
+
+      iex> Locations.new(%{latitude: -50.75})
+      %Locations{altitude: nil, latitude: -50.75}
+
+      iex> Locations.new(%{latitude: "invalid"})
+      ** (ArgumentError) latitude must be a float
 
       iex> Locations.new(%{})
-      %Locations{altitude: nil}
+      ** (ArgumentError) latitude is required
 
-      iex> Locations.new(%{altitude: -50.75})
-      %Locations{altitude: -50.75}
-
-      iex> Locations.new(%{altitude: "invalid"})
-      ** (ArgumentError) altitude must be a float
+      iex> Locations.new(%{latitude: 91.0})
+      ** (ArgumentError) latitude must be between -90 and 90
 
   """
   @spec new(map()) :: %__MODULE__{}
@@ -54,6 +63,7 @@ defmodule ExPass.Structs.Locations do
     attrs =
       attrs
       |> validate(:altitude, &Validators.validate_optional_float(&1, :altitude))
+      |> validate(:latitude, &Validators.validate_latitude(&1, :latitude))
 
     struct!(__MODULE__, attrs)
   end

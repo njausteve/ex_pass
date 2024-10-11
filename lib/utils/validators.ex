@@ -906,11 +906,57 @@ defmodule ExPass.Utils.Validators do
   @spec validate_optional_float(term(), atom()) :: :ok | {:error, String.t()}
   def validate_optional_float(nil, _field_name), do: :ok
   def validate_optional_float(value, _field_name) when is_float(value), do: :ok
+  def validate_optional_float(_, field_name), do: {:error, "#{field_name} must be a float"}
 
-  def validate_optional_float(value, field_name) when is_integer(value),
+  @doc """
+  Validates that the given value is a float within the range of -90 to 90 (inclusive).
+
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `field_name` - The name of the field being validated as an atom.
+
+  ## Returns
+
+    * `:ok` if the value is a valid float within the range.
+    * `{:error, reason}` if the value is not a valid float or is outside the range.
+
+  ## Examples
+
+      iex> validate_latitude(37.7749, :latitude)
+      :ok
+
+      iex> validate_latitude(-90.0, :latitude)
+      :ok
+
+      iex> validate_latitude(90.0, :latitude)
+      :ok
+
+      iex> validate_latitude(90.1, :latitude)
+      {:error, "latitude must be between -90 and 90"}
+
+      iex> validate_latitude(-90.1, :latitude)
+      {:error, "latitude must be between -90 and 90"}
+
+      iex> validate_latitude("37.7749", :latitude)
+      {:error, "latitude must be a float"}
+
+      iex> validate_latitude(nil, :latitude)
+      {:error, "latitude is a required field and cannot be nil"}
+
+  """
+  @spec validate_latitude(float() | nil, atom()) :: :ok | {:error, String.t()}
+  def validate_latitude(nil, field_name),
+    do: {:error, "#{field_name} is a required field and cannot be nil"}
+
+  def validate_latitude(value, _field_name) when is_float(value) and value >= -90 and value <= 90,
+    do: :ok
+
+  def validate_latitude(value, field_name) when is_float(value),
+    do: {:error, "#{field_name} must be between -90 and 90"}
+
+  def validate_latitude(_value, field_name),
     do: {:error, "#{field_name} must be a float"}
-
-  def validate_optional_float(_value, field_name), do: {:error, "#{field_name} must be a float"}
 
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
