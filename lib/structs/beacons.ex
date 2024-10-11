@@ -68,6 +68,7 @@ defmodule ExPass.Structs.Beacons do
   def new(attrs \\ %{}) do
     attrs =
       attrs
+      |> Converter.trim_string_values()
       |> validate(:major, &Validators.validate_optional_16bit_unsigned_integer(&1, :major))
       |> validate(:minor, &Validators.validate_optional_16bit_unsigned_integer(&1, :minor))
       |> validate(:proximity_UUID, &Validators.validate_uuid/1)

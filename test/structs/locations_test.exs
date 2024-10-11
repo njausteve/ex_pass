@@ -208,4 +208,54 @@ defmodule ExPass.Structs.LocationsTest do
       end
     end
   end
+
+  describe "relevantText" do
+    test "creates a valid Locations struct with relevantText" do
+      params = %{
+        latitude: 37.7749,
+        longitude: -122.4194,
+        relevant_text: "Store nearby on 1st and Main"
+      }
+
+      assert %Locations{} = location = Locations.new(params)
+      assert location.latitude == 37.7749
+      assert location.longitude == -122.4194
+      assert location.relevant_text == "Store nearby on 1st and Main"
+      encoded = Jason.encode!(location)
+      assert encoded =~ ~s("relevantText":"Store nearby on 1st and Main")
+    end
+
+    test "creates a valid Locations struct without relevantText" do
+      params = %{latitude: 37.7749, longitude: -122.4194}
+
+      assert %Locations{} = location = Locations.new(params)
+      assert location.latitude == 37.7749
+      assert location.longitude == -122.4194
+      assert location.relevant_text == nil
+      encoded = Jason.encode!(location)
+      refute encoded =~ "relevantText"
+    end
+
+    test "trims whitespace from relevantText" do
+      params = %{latitude: 37.7749, longitude: -122.4194, relevant_text: "  Store nearby  "}
+
+      assert %Locations{} = location = Locations.new(params)
+      assert location.relevant_text == "Store nearby"
+    end
+
+    test "returns error for non-string relevantText" do
+      params = %{latitude: 37.7749, longitude: -122.4194, relevant_text: 123}
+
+      assert_raise ArgumentError, "relevant_text must be a string if provided", fn ->
+        Locations.new(params)
+      end
+    end
+
+    test "allows empty string for relevantText" do
+      params = %{latitude: 37.7749, longitude: -122.4194, relevant_text: ""}
+
+      assert %Locations{} = location = Locations.new(params)
+      assert location.relevant_text == ""
+    end
+  end
 end
