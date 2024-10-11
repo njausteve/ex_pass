@@ -996,8 +996,9 @@ defmodule ExPass.Utils.Validators do
   def validate_longitude(nil, field_name),
     do: {:error, "#{field_name} is a required field and cannot be nil"}
 
-  def validate_longitude(value, _field_name) when is_float(value) and value >= -180 and value <= 180,
-    do: :ok
+  def validate_longitude(value, _field_name)
+      when is_float(value) and value >= -180 and value <= 180,
+      do: :ok
 
   def validate_longitude(value, field_name) when is_float(value),
     do: {:error, "#{field_name} must be between -180 and 180"}
