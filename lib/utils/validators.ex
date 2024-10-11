@@ -958,6 +958,53 @@ defmodule ExPass.Utils.Validators do
   def validate_latitude(_value, field_name),
     do: {:error, "#{field_name} must be a float"}
 
+  @doc """
+  Validates that the given value is a float within the range of -180 to 180 (inclusive).
+
+  ## Parameters
+
+    * `value` - The value to validate.
+    * `field_name` - The name of the field being validated as an atom.
+
+  ## Returns
+
+    * `:ok` if the value is a valid float within the range.
+    * `{:error, reason}` if the value is not a valid float or is outside the range.
+
+  ## Examples
+
+      iex> validate_longitude(122.4194, :longitude)
+      :ok
+
+      iex> validate_longitude(-180.0, :longitude)
+      :ok
+
+      iex> validate_longitude(180.0, :longitude)
+      :ok
+
+      iex> validate_longitude(180.1, :longitude)
+      {:error, "longitude must be between -180 and 180"}
+
+      iex> validate_longitude(-180.1, :longitude)
+      {:error, "longitude must be between -180 and 180"}
+
+      iex> validate_longitude("122.4194", :longitude)
+      {:error, "longitude must be a float"}
+
+  """
+  @spec validate_longitude(float() | nil, atom()) :: :ok | {:error, String.t()}
+  def validate_longitude(nil, field_name),
+    do: {:error, "#{field_name} is a required field and cannot be nil"}
+
+  def validate_longitude(value, _field_name) when is_float(value) and value >= -180 and value <= 180,
+    do: :ok
+
+  def validate_longitude(value, field_name) when is_float(value),
+    do: {:error, "#{field_name} must be between -180 and 180"}
+
+  def validate_longitude(_value, field_name),
+    do: {:error, "#{field_name} must be a float"}
+
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
       :ok
