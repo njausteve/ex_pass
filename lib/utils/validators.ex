@@ -255,6 +255,11 @@ defmodule ExPass.Utils.Validators do
     "KOI8-R"
   ]
 
+  # OIDs for the algorithm and curve
+  @id_ec_public_key_oid {1, 2, 840, 10_045, 2, 1}
+  @prime256v1_oid {1, 2, 840, 10_045, 3, 1, 7}
+  @prime256v1_oid_der <<6, 8, 42, 134, 72, 206, 61, 3, 1, 7>>
+
   @doc """
   Validates the type of the attributed value.
 
@@ -1005,6 +1010,148 @@ defmodule ExPass.Utils.Validators do
 
   def validate_longitude(_value, field_name),
     do: {:error, "#{field_name} must be a float"}
+
+  @doc """
+  Validates the required encryption public key string.
+
+  This function performs several checks on the provided encryption public key:
+  1. Ensures the key is not nil or an empty string.
+  2. Verifies that the key is a valid Base64 encoded string.
+  3. Checks that the decoded key conforms to the SubjectPublicKeyInfo structure.
+  4. Validates that the key uses the correct algorithm (ECDH with P-256 curve).
+  5. Confirms that the key size is correct for a P-256 curve public key.
+
+  ## Parameters
+
+    * `key_string` - The encryption public key as a Base64 encoded string.
+    * `field_name` - The name of the field being validated (used in error messages).
+
+  ## Returns
+
+    * `:ok` if the key is valid.
+    * `{:error, reason}` if the key is invalid, where `reason` is a string explaining the error.
+
+  ## Examples
+
+      iex> valid_key = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHhqHrZCQZA1uXSXKBNJBCl+h3fHzX6qXzjXwNzDDHJKwXzhpUeWi9xR9AbiGZWczKXZkNAWoZXGzxQpCg/v6Ug=="
+      iex> validate_required_encryption_public_key_string(valid_key, :encryption_public_key)
+      :ok
+
+      iex> validate_required_encryption_public_key_string(nil, :encryption_public_key)
+      {:error, "encryption_public_key is required and cannot be nil. Expected a non-empty Base64 encoded X.509 SubjectPublicKeyInfo structure."}
+
+      iex> validate_required_encryption_public_key_string("", :encryption_public_key)
+      {:error, "encryption_public_key is required and cannot be an empty string. Expected a non-empty Base64 encoded X.509 SubjectPublicKeyInfo structure."}
+
+      iex> validate_required_encryption_public_key_string("invalidBase64!", :encryption_public_key)
+      {:error, "Invalid Base64 encoding. The provided encryption_public_key could not be decoded as Base64."}
+
+      iex> invalid_key = "MIIBCgKCAQEAvnYlqPbI79ZtPSy0JgFcW5rKj4U0YnJPXBtFWlrxXbXcpRRlHXHtavN66xTrTpslsfK8HZ1K5gJ9bWarXA=="
+      iex> validate_required_encryption_public_key_string(invalid_key, :encryption_public_key)
+      {:error, "Invalid SubjectPublicKeyInfo structure. The provided encryption_public_key does not conform to the expected X.509 SubjectPublicKeyInfo format. Please ensure you're using a valid ECDH public key with the P-256 curve."}
+
+      iex> validate_required_encryption_public_key_string(123, :encryption_public_key)
+      {:error, "encryption_public_key must be a string. Expected a non-empty Base64 encoded X.509 SubjectPublicKeyInfo structure."}
+
+  """
+  @spec validate_required_encryption_public_key_string(any(), atom()) ::
+          :ok | {:error, String.t()}
+  def validate_required_encryption_public_key_string(nil, field_name),
+    do:
+      {:error,
+       "#{field_name} is required and cannot be nil. Expected a non-empty Base64 encoded X.509 SubjectPublicKeyInfo structure."}
+
+  def validate_required_encryption_public_key_string("", field_name),
+    do:
+      {:error,
+       "#{field_name} is required and cannot be an empty string. Expected a non-empty Base64 encoded X.509 SubjectPublicKeyInfo structure."}
+
+  def validate_required_encryption_public_key_string(key_string, field_name)
+      when is_binary(key_string),
+      do: validate_encryption_public_key(key_string, field_name)
+
+  def validate_required_encryption_public_key_string(_non_string, field_name),
+    do:
+      {:error,
+       "#{field_name} must be a string. Expected a non-empty Base64 encoded X.509 SubjectPublicKeyInfo structure."}
+
+  defp validate_encryption_public_key(key_string, field_name) do
+    with {:ok, der_encoded} <- Base.decode64(key_string),
+         {:ok, subject_public_key_info} <-
+           der_decode_subject_public_key_info(der_encoded, field_name),
+         :ok <- verify_algorithm(subject_public_key_info.algorithm, field_name),
+         :ok <- verify_key_size(subject_public_key_info.public_key, field_name) do
+      :ok
+    else
+      {:error, reason} ->
+        {:error, reason}
+
+      :error ->
+        {:error,
+         "Invalid Base64 encoding. The provided #{field_name} could not be decoded as Base64."}
+    end
+  end
+
+  defp der_decode_subject_public_key_info(der_encoded, field_name) do
+    try do
+      case :public_key.der_decode(:SubjectPublicKeyInfo, der_encoded) do
+        {:SubjectPublicKeyInfo, algorithm, public_key} ->
+          {:ok, %{algorithm: algorithm, public_key: public_key}}
+
+        _ ->
+          # credo:disable-for-next-line Credo.Check.Design.TagTODO
+          # TODO: Add test for invalid SubjectPublicKeyInfo structure
+          {:error,
+           "Invalid SubjectPublicKeyInfo structure. The provided #{field_name} does not conform to the expected X.509 SubjectPublicKeyInfo format. Please ensure you're using a valid ECDH public key with the P-256 curve."}
+      end
+    rescue
+      error ->
+        {:error,
+         "Failed to decode SubjectPublicKeyInfo structure. The provided #{field_name} could not be parsed. Error details: #{inspect(error)}"}
+    end
+  end
+
+  defp verify_algorithm({:AlgorithmIdentifier, algorithm_oid, params_oid}, field_name) do
+    with :ok <- check_algorithm(algorithm_oid, field_name),
+         :ok <- check_curve(params_oid, field_name) do
+      :ok
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp check_algorithm(algorithm_oid, field_name) do
+    if algorithm_oid == @id_ec_public_key_oid do
+      :ok
+    else
+      {:error, "Invalid algorithm ID for #{field_name}. Expected ECDH (id-ecPublicKey)"}
+    end
+  end
+
+  defp check_curve(params_oid, field_name) do
+    cond do
+      is_tuple(params_oid) and params_oid == @prime256v1_oid ->
+        :ok
+
+      is_binary(params_oid) and params_oid == @prime256v1_oid_der ->
+        :ok
+
+      true ->
+        {:error, "Invalid curve for #{field_name}. Expected P-256 curve (prime256v1)"}
+    end
+  end
+
+  defp verify_key_size(public_key, field_name) do
+    case byte_size(public_key) do
+      # Expected size for an uncompressed P-256 public key
+      65 ->
+        :ok
+
+      _ ->
+        {:error,
+         "Invalid key size for #{field_name}. Expected 65 bytes for uncompressed P-256 public key, but got #{byte_size(public_key)} bytes"}
+    end
+  end
 
   defp validate_inclusion(value, valid_values, field_name) do
     if value in valid_values do
