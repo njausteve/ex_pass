@@ -1,4 +1,4 @@
-# ExPass
+****# ExPass
 
 ExPass is an Elixir library for generating and manipulating Apple Wallet passes.
 
@@ -83,7 +83,7 @@ end
 |  | `Pass.semanticTags.seat.seatNumber` | [#111](https://github.com/njausteve/ex_pass/issues/111) | `todo` |
 |  | `Pass.semanticTags.seat.seatRow` | [#112](https://github.com/njausteve/ex_pass/issues/112) | `todo` |
 |  | `Pass.semanticTags.seat.seatSection` | [#113](https://github.com/njausteve/ex_pass/issues/113) | `todo` |
-|  | `Pass.semanticTags.seat.seatType` | [#114](https://github.com/njausteve/ex_pass/issues/114) | `todo` |
+|  | `Pass.semanticTags.seat.seatType` | [#114](https://github.com/njausteve/ex_pass/issues/114) | ✅ |
 | `Pass.Locations` | `Pass.locations.altitude` |  | `todo` |
 |  | `Pass.locations.latitude` |  | `todo` |
 |  | `Pass.locations.longitude` | [#90](https://github.com/njausteve/ex_pass/issues/90) | `todo` |
