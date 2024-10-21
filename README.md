@@ -1,4 +1,4 @@
-****# ExPass
+# ExPass
 
 ExPass is an Elixir library for generating and manipulating Apple Wallet passes.
 

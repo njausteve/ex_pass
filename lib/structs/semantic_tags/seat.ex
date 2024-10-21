@@ -27,7 +27,7 @@ defmodule ExPass.Structs.SemanticTags.Seat do
 
   ## Parameters
 
-    * `attrs` - A map of attributes for the Locations struct. The map can include the following keys:
+    * `attrs` - A map of attributes for the Seat struct. The map can include the following keys:
       * `:seat_type` - (Optional) The type of seat, such as “Reserved seating”.
 
   ## Returns
