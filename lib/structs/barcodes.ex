@@ -47,9 +47,9 @@ defmodule ExPass.Structs.Barcodes do
     https://www.iana.org/assignments/character-sets/character-sets.xhtml.
   """
 
+  use ExPass.Structs.Base
   use TypedStruct
 
-  alias ExPass.Utils.Converter
   alias ExPass.Utils.Validators
 
   typedstruct do
@@ -113,27 +113,5 @@ defmodule ExPass.Structs.Barcodes do
       |> validate(:message_encoding, &Validators.validate_message_encoding/1)
 
     struct!(__MODULE__, attrs)
-  end
-
-  defp validate(attrs, key, validator) do
-    case validator.(attrs[key]) do
-      :ok ->
-        attrs
-
-      {:error, reason} ->
-        raise ArgumentError, reason
-    end
-  end
-
-  defimpl Jason.Encoder, for: __MODULE__ do
-    def encode(field_content, opts) do
-      field_content
-      |> Map.from_struct()
-      |> Enum.reduce(%{}, fn
-        {_k, nil}, acc -> acc
-        {k, v}, acc -> Map.put(acc, Converter.camelize_key(k), v)
-      end)
-      |> Jason.Encode.map(opts)
-    end
   end
 end
