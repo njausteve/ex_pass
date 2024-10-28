@@ -13,6 +13,7 @@ defmodule ExPass.Structs.SemanticTags.Seat do
   - watchOS 2.0+
   """
 
+  use ExPass.Structs.Base
   use TypedStruct
 
   alias ExPass.Utils.Converter
@@ -51,27 +52,5 @@ defmodule ExPass.Structs.SemanticTags.Seat do
       |> validate(:seat_type, &Validators.validate_optional_string(&1, :seat_type))
 
     struct!(__MODULE__, attrs)
-  end
-
-  defp validate(attrs, key, validator) do
-    case validator.(attrs[key]) do
-      :ok ->
-        attrs
-
-      {:error, reason} ->
-        raise ArgumentError, reason
-    end
-  end
-
-  defimpl Jason.Encoder do
-    def encode(seat, opts) do
-      seat
-      |> Map.from_struct()
-      |> Enum.reduce(%{}, fn
-        {_k, nil}, acc -> acc
-        {k, v}, acc -> Map.put(acc, Converter.camelize_key(k), v)
-      end)
-      |> Jason.Encode.map(opts)
-    end
   end
 end
