@@ -3,6 +3,12 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
   use ExUnit.Case, async: true
   alias ExPass.Structs.SemanticTags.Seat
 
+  describe "new/0" do
+    test "creates an empty Seat struct" do
+      assert %Seat{} = Seat.new()
+    end
+  end
+
   describe "new/1 with seat_type" do
     test "creates a valid Seat struct with seat_type" do
       params = %{seat_type: "Reserved seating"}
