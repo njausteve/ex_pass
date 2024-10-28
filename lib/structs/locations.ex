@@ -16,9 +16,9 @@ defmodule ExPass.Structs.Locations do
   - watchOS 2.0+
   """
 
+  use ExPass.Structs.Base
   use TypedStruct
 
-  alias ExPass.Utils.Converter
   alias ExPass.Utils.Validators
 
   typedstruct do
@@ -81,27 +81,5 @@ defmodule ExPass.Structs.Locations do
       |> validate(:relevant_text, &Validators.validate_optional_string(&1, :relevant_text))
 
     struct!(__MODULE__, attrs)
-  end
-
-  defp validate(attrs, key, validator) do
-    case validator.(attrs[key]) do
-      :ok ->
-        attrs
-
-      {:error, reason} ->
-        raise ArgumentError, reason
-    end
-  end
-
-  defimpl Jason.Encoder do
-    def encode(field_content, opts) do
-      field_content
-      |> Map.from_struct()
-      |> Enum.reduce(%{}, fn
-        {_k, nil}, acc -> acc
-        {k, v}, acc -> Map.put(acc, Converter.camelize_key(k), v)
-      end)
-      |> Jason.Encode.map(opts)
-    end
   end
 end
