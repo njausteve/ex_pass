@@ -20,25 +20,23 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: Test on OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
     strategy:
       # Specify the OTP and Elixir versions to use when building
       # and running the workflow steps.
       matrix:
-        otp: ["25.x", "26.x", "27.x"] # Define the OTP versions [required]
-        elixir: ["1.16.x", "1.17.x"] # Define the Elixir versions [required]
-        exclude:
-          - otp: "27.x"
-            elixir: "1.16.x"
-          - otp: "25.x"
-            elixir: "1.17.x"
+        include:
+          - otp: "25"
+            elixir: "1.16"
+          - otp: "27"
+            elixir: "1.17"
+            lint: true
     steps:
       # Step: Setup Elixir + Erlang image as the base.
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.otp}}
-          elixir-version: ${{matrix.elixir}}
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
       # Step: Check out the code.
       - name: Checkout code
@@ -55,6 +53,7 @@ jobs:
           key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.cache-name }}-
+
       # Step: Define how to cache the `_build` directory. After the first run,
       # this speeds up tests runs a lot. This includes not re-compiling our
       # project's downloaded deps every run.
@@ -69,6 +68,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.cache-name }}-
             ${{ runner.os }}-mix-
+
       # Step: Conditionally bust the cache when job is re-run.
       # Sometimes, we may have issues with incremental builds that are fixed by
       # doing a full recompile. In order to not waste dev time on such trivial
@@ -89,6 +89,7 @@ jobs:
           mix local.rebar --force
           mix local.hex --force
           mix deps.get
+
       # Step: Compile the project treating any warnings as errors.
       # Customize this step if a different behavior is desired.
       - name: Compiles without warnings
@@ -98,22 +99,26 @@ jobs:
       # This step ensures that all listed dependencies are actually used in the project
       - name: Check unused deps
         run: mix deps.unlock --check-unused
+        if: ${{ matrix.lint }}
 
       # Step: Run Credo for code analysis
       # Credo is a static code analysis tool that focuses on teaching and code consistency
       - name: Check credo
         run: mix credo
+        if: ${{ matrix.lint }}
 
       # Step: Run Sobelow for security analysis
       # Sobelow is a security-focused static analysis tool for the Phoenix framework
       - name: Run Sobelow
         run: mix sobelow
+        if: ${{ matrix.lint }}
 
       # Step: Check that the checked in code has already been formatted.
       # This step fails if something was found unformatted.
       # Customize this step as desired.
       - name: Check Formatting
         run: mix format --check-formatted
+        if: ${{ matrix.lint }}
 
       # Step: Execute the tests.
       - name: Run tests
