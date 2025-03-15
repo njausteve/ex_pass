@@ -4,6 +4,8 @@ defmodule ExPass.Structs.NFC do
 
   ## Fields
 
+  * `:message` - (Required) The payload the device transmits to the Apple Pay terminal.
+    The size needs to be no more than 64 bytes. The system truncates messages longer than 64 bytes.
   * `:requires_authentication` - (Optional) A Boolean value that indicates whether the NFC pass requires authentication.
     When set to true, it requires the user to authenticate for each use of the NFC pass.
     The default value is nil (not included in the pass).
@@ -21,6 +23,7 @@ defmodule ExPass.Structs.NFC do
   alias ExPass.Utils.Validators
 
   typedstruct do
+    field :message, String.t(), enforce: true
     field :requires_authentication, boolean(), default: nil
   end
 
@@ -30,6 +33,8 @@ defmodule ExPass.Structs.NFC do
   ## Parameters
 
     * `attrs` - A map of attributes for the NFC struct. The map can include the following keys:
+      * `:message` - (Required) The payload the device transmits to the Apple Pay terminal.
+        The size needs to be no more than 64 bytes. The system truncates messages longer than 64 bytes.
       * `:requires_authentication` - (Optional) A Boolean value that indicates whether the NFC pass requires authentication.
         When set to true, it requires the user to authenticate for each use of the NFC pass.
         The default value is nil (not included in the pass).
@@ -40,29 +45,24 @@ defmodule ExPass.Structs.NFC do
 
   ## Examples
 
-      iex> NFC.new()
-      %NFC{requires_authentication: nil}
+      iex> NFC.new(%{message: "test message"})
+      %NFC{message: "test message", requires_authentication: nil}
 
-      iex> NFC.new(%{requires_authentication: true})
-      %NFC{requires_authentication: true}
-
-      iex> NFC.new(%{requires_authentication: false})
-      %NFC{requires_authentication: false}
+      iex> NFC.new(%{message: "test message", requires_authentication: true})
+      %NFC{message: "test message", requires_authentication: true}
 
       iex> NFC.new(%{})
-      %NFC{requires_authentication: nil}
+      ** (ArgumentError) message is required
 
-      iex> NFC.new(%{requires_authentication: nil})
-      %NFC{requires_authentication: nil}
-
-      iex> NFC.new(%{requires_authentication: "true"})
-      ** (ArgumentError) requires_authentication must be a boolean value (true or false)
+      iex> NFC.new(%{message: String.duplicate("a", 65)})
+      ** (ArgumentError) message must be no more than 64 bytes
 
   """
   @spec new(map()) :: %__MODULE__{}
   def new(attrs \\ %{}) do
     attrs =
       attrs
+      |> validate(:message, &Validators.validate_message_length(&1, 64, :message))
       |> validate(
         :requires_authentication,
         &Validators.validate_boolean_field(&1, :requires_authentication)

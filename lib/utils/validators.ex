@@ -256,6 +256,52 @@ defmodule ExPass.Utils.Validators do
   ]
 
   @doc """
+  Validates that a message string does not exceed a specified maximum byte length.
+
+  ## Parameters
+
+    * `message` - The message string to validate.
+    * `max_bytes` - The maximum allowed byte length.
+    * `field_name` - The name of the field being validated, used in error messages.
+
+  ## Returns
+
+    * `:ok` if the message is valid.
+    * `{:error, reason}` if the message is invalid.
+
+  ## Examples
+
+      iex> validate_message_length("Hello", 10, :message)
+      :ok
+
+      iex> validate_message_length("This is a long message", 10, :message)
+      {:error, "message must be no more than 10 bytes"}
+
+      iex> validate_message_length(nil, 64, :message)
+      {:error, "message is required"}
+
+      iex> validate_message_length(123, 64, :message)
+      {:error, "message must be a string"}
+
+  """
+  @spec validate_message_length(any(), non_neg_integer(), atom()) :: :ok | {:error, String.t()}
+  def validate_message_length(message, max_bytes, field_name) do
+    case message do
+      nil ->
+        {:error, "#{field_name} is required"}
+
+      _ when not is_binary(message) ->
+        {:error, "#{field_name} must be a string"}
+
+      _ when byte_size(message) > max_bytes ->
+        {:error, "#{field_name} must be no more than #{max_bytes} bytes"}
+
+      _ ->
+        :ok
+    end
+  end
+
+  @doc """
   Validates the type of the attributed value.
 
   This function checks if the given value is of a valid type for an attributed value.
