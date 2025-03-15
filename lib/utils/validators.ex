@@ -285,17 +285,19 @@ defmodule ExPass.Utils.Validators do
 
   """
   @spec validate_message_length(any(), non_neg_integer(), atom()) :: :ok | {:error, String.t()}
-  def validate_message_length(nil, _max_bytes, field_name),
-    do: {:error, "#{field_name} is required"}
+  def validate_message_length(message, max_bytes, field_name) do
+    case message do
+      nil ->
+        {:error, "#{field_name} is required"}
 
-  def validate_message_length(message, _max_bytes, field_name) when not is_binary(message),
-    do: {:error, "#{field_name} must be a string"}
+      _ when not is_binary(message) ->
+        {:error, "#{field_name} must be a string"}
 
-  def validate_message_length(message, max_bytes, field_name) when is_binary(message) do
-    if byte_size(message) <= max_bytes do
-      :ok
-    else
-      {:error, "#{field_name} must be no more than #{max_bytes} bytes"}
+      _ when byte_size(message) > max_bytes ->
+        {:error, "#{field_name} must be no more than #{max_bytes} bytes"}
+
+      _ ->
+        :ok
     end
   end
 
