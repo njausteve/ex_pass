@@ -26,43 +26,38 @@ defmodule ExPass.Utils.PublicKey do
     * `field_name` - The name of the field being validated
 
   ## Returns
-    * The original value if valid
-
-  ## Raises
-    * `ArgumentError` if the value is invalid
+    * `:ok` if the value is valid
+    * `{:error, reason}` if the value is invalid, where reason is a string explaining the error
 
   ## Examples
 
       iex> validate_encryption_public_key("BASE64_ENCODED_VALID_KEY==", :encryption_public_key)
-      "BASE64_ENCODED_VALID_KEY=="
+      :ok
 
       iex> validate_encryption_public_key(nil, :encryption_public_key)
-      ** (ArgumentError) encryption_public_key is required
+      {:error, "encryption_public_key is required"}
 
       iex> validate_encryption_public_key("invalid base64!", :encryption_public_key)
-      ** (ArgumentError) encryption_public_key must be a valid Base64 string
+      {:error, "encryption_public_key must be a valid Base64 string"}
 
   """
-  @spec validate_encryption_public_key(String.t() | nil, atom()) :: String.t()
+  @spec validate_encryption_public_key(String.t() | nil, atom()) :: :ok | {:error, String.t()}
   def validate_encryption_public_key(nil, field_name),
-    do: raise(ArgumentError, "#{field_name} is required")
+    do: {:error, "#{field_name} is required"}
 
   def validate_encryption_public_key(value, field_name) do
     cond do
       not is_binary(value) ->
-        raise ArgumentError, "#{field_name} must be a string"
+        {:error, "#{field_name} must be a string"}
 
       String.trim(value) == "" ->
-        raise ArgumentError, "#{field_name} is required"
+        {:error, "#{field_name} is required"}
 
       not base64?(value) ->
-        raise ArgumentError, "#{field_name} must be a valid Base64 string"
+        {:error, "#{field_name} must be a valid Base64 string"}
 
       true ->
-        case validate_x509_spki_with_p256_ecdh(value, field_name) do
-          {:ok, _} -> value
-          {:error, reason} -> raise ArgumentError, "#{field_name} #{reason}"
-        end
+        validate_x509_spki_with_p256_ecdh(value, field_name)
     end
   end
 
@@ -73,7 +68,7 @@ defmodule ExPass.Utils.PublicKey do
     end
   end
 
-  defp validate_x509_spki_with_p256_ecdh(base64_str, _field_name) do
+  defp validate_x509_spki_with_p256_ecdh(base64_str, field_name) do
     try do
       {:ok, der} = Base.decode64(base64_str, padding: false)
 
@@ -81,19 +76,19 @@ defmodule ExPass.Utils.PublicKey do
         {:SubjectPublicKeyInfo, algorithm, public_key} ->
           cond do
             not valid_ecdh_p256_algorithm?(algorithm) ->
-              {:error, "has an invalid algorithm. Expected ECDH P256 algorithm"}
+              {:error, "#{field_name} has an invalid algorithm. Expected ECDH P256 algorithm"}
 
             not valid_ecdh_p256_key_format?(public_key) ->
               {:error,
-               "has an invalid key format. Expected uncompressed (65 bytes) or compressed (33 bytes) EC point"}
+               "#{field_name} has an invalid key format. Expected uncompressed (65 bytes) or compressed (33 bytes) EC point"}
 
             true ->
-              {:ok, public_key}
+              :ok
           end
       end
     rescue
       _ ->
-        {:error, "is not a valid X.509 SubjectPublicKeyInfo structure"}
+        {:error, "#{field_name} is not a valid X.509 SubjectPublicKeyInfo structure"}
     end
   end
 
