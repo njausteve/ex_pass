@@ -33,3 +33,4 @@ ex_pass-*.tar
 
 # Ignore Elixir Language Server files
 .elixir_ls/
+.qodo
