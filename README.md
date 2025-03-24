@@ -44,9 +44,9 @@ end
 | 24 | ✅ |  | `Pass.locations.longitude` | [#91](https://github.com/njausteve/ex_pass/issues/91) |
 | 25 | ✅ |  | `Pass.locations.relevantText` | [#92](https://github.com/njausteve/ex_pass/issues/92) |
 | 26 | ✅ | `Pass.SemanticTags.Seat` | `Pass.semanticTags.seat.seatType` | [#114](https://github.com/njausteve/ex_pass/issues/114) |
-| 27 | `todo` | `Pass.NFC` | `Pass.nfc.encryptionPublicKey` | [#93](https://github.com/njausteve/ex_pass/issues/93) |
-| 28 | `todo` |  | `Pass.nfc.message` | [#94](https://github.com/njausteve/ex_pass/issues/94) |
-| 29 | `todo` |  | `Pass.nfc.requiresAuthentication` | [#95](https://github.com/njausteve/ex_pass/issues/95) |
+| 27 | ✅ | `Pass.NFC` | `Pass.nfc.encryptionPublicKey` | [#93](https://github.com/njausteve/ex_pass/issues/93) |
+| 28 | ✅ |  | `Pass.nfc.message` | [#94](https://github.com/njausteve/ex_pass/issues/94) |
+| 29 | ✅ |  | `Pass.nfc.requiresAuthentication` | [#95](https://github.com/njausteve/ex_pass/issues/95) |
 | 30 | `todo` | `Pass.PassFields.AuxiliaryFields` | Inherits From `Pass.PassFieldContent` |  |
 | 31 | `todo` |  | `Pass.PassFields.AuxiliaryFields.row` | [#64](https://github.com/njausteve/ex_pass/issues/64) |
 | 32 | `todo` | `Pass.PassFields.SecondaryFields` | Inherits From `Pass.PassFieldContent` | [#69](https://github.com/njausteve/ex_pass/issues/69) |
