@@ -79,7 +79,7 @@ end
 | 59 | `todo` |  | `Pass.semanticTags.personNameComponents.nameSuffix` | [#105](https://github.com/njausteve/ex_pass/issues/105) |
 | 60 | `todo` |  | `Pass.semanticTags.personNameComponents.nickname` | [#106](https://github.com/njausteve/ex_pass/issues/106) |
 | 61 | `todo` |  | `Pass.semanticTags.personNameComponents.phoneticRepresentation` | [#107](https://github.com/njausteve/ex_pass/issues/107) |
-| 62 | `todo` | `Pass.SemanticTags.Seat` | `Pass.semanticTags.seat.seatDescription` | [#109](https://github.com/njausteve/ex_pass/issues/109) |
+| 62 | ✅ | `Pass.SemanticTags.Seat` | `Pass.semanticTags.seat.seatDescription` | [#109](https://github.com/njausteve/ex_pass/issues/109) |
 | 63 | `todo` |  | `Pass.semanticTags.seat.seatIdentifier` | [#110](https://github.com/njausteve/ex_pass/issues/110) |
 | 64 | `todo` |  | `Pass.semanticTags.seat.seatNumber` | [#111](https://github.com/njausteve/ex_pass/issues/111) |
 | 65 | `todo` |  | `Pass.semanticTags.seat.seatRow` | [#112](https://github.com/njausteve/ex_pass/issues/112) |
