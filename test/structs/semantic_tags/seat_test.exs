@@ -220,4 +220,46 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
       assert seat.seat_row == ""
     end
   end
+
+  describe "new/1 with seat_section" do
+    test "creates a valid Seat struct with seat_section" do
+      params = %{seat_section: "Aisle 12"}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_section == "Aisle 12"
+
+      encoded = Jason.encode!(seat)
+      assert encoded =~ ~s("seatSection":"Aisle 12")
+    end
+
+    test "creates a valid Seat struct without seat_section" do
+      assert %Seat{} = seat = Seat.new(%{})
+      refute seat.seat_section
+
+      encoded = Jason.encode!(seat)
+      refute encoded =~ "seat_section"
+    end
+
+    test "trims whitespace from seat_section" do
+      params = %{seat_section: "  Aisle 12  "}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_section == "Aisle 12"
+    end
+
+    test "returns error for non-string seat_section" do
+      params = %{seat_section: 123}
+
+      assert_raise ArgumentError, "seat_section must be a string if provided", fn ->
+        Seat.new(params)
+      end
+    end
+
+    test "allows empty string for seat_section" do
+      params = %{seat_section: ""}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_section == ""
+    end
+  end
 end
