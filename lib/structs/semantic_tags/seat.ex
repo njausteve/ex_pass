@@ -7,6 +7,7 @@ defmodule ExPass.Structs.SemanticTags.Seat do
   * `:seat_type` - Optional. The type of seat, such as “Reserved seating”.
   * `:seat_description` - Optional. A description of the seat, such as “A flat bed seat“.
   * `:seat_identifier` - Optional. A unique identifier for the seat, such as “Aisle 12, Row 3, Seat 5”.
+  * `:seat_number` - Optional. The number of the seat, such as “3A”.
 
   ## Compatibility
 
@@ -25,6 +26,7 @@ defmodule ExPass.Structs.SemanticTags.Seat do
     field :seat_type, String.t()
     field :seat_description, String.t()
     field :seat_identifier, String.t()
+    field :seat_number, String.t()
   end
 
   @doc """
@@ -36,6 +38,7 @@ defmodule ExPass.Structs.SemanticTags.Seat do
       * `:seat_type` - (Optional) The type of seat, such as “Reserved seating”.
       * `:seat_description` - (Optional) A description of the seat, such as “A flat bed seat“.
       * `:seat_identifier` - (Optional) A unique identifier for the seat, such as “Aisle 12, Row 3, Seat 5”.
+      * `:seat_number` - (Optional) The number of the seat, such as “3A”.
 
   ## Returns
 
@@ -43,8 +46,8 @@ defmodule ExPass.Structs.SemanticTags.Seat do
 
   ## Examples
 
-      iex> Seat.new(%{seat_type: "Reserved seating", seat_description: "A push back seat", seat_identifier: "Aisle 12, Row 3, Seat 5"})
-      %Seat{seat_type: "Reserved seating", seat_description: "A push back seat", seat_identifier: "Aisle 12, Row 3, Seat 5"}
+      iex> Seat.new(%{seat_type: "Reserved seating", seat_description: "A push back seat", seat_identifier: "Aisle 12, Row 3, Seat 5", seat_number: "3E"})
+      %Seat{seat_type: "Reserved seating", seat_description: "A push back seat", seat_identifier: "Aisle 12, Row 3, Seat 5", seat_number: "3E"}
 
       iex> Seat.new(%{seat_type: 123})
       ** (ArgumentError) seat_type must be a string if provided
@@ -58,6 +61,7 @@ defmodule ExPass.Structs.SemanticTags.Seat do
       |> validate(:seat_type, &Validators.validate_optional_string(&1, :seat_type))
       |> validate(:seat_description, &Validators.validate_optional_string(&1, :seat_description))
       |> validate(:seat_identifier, &Validators.validate_optional_string(&1, :seat_identifier))
+      |> validate(:seat_number, &Validators.validate_optional_string(&1, :seat_number))
 
     struct!(__MODULE__, attrs)
   end
