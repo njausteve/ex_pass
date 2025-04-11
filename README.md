@@ -80,10 +80,10 @@ end
 | 60 | `todo` |  | `Pass.semanticTags.personNameComponents.nickname` | [#106](https://github.com/njausteve/ex_pass/issues/106) |
 | 61 | `todo` |  | `Pass.semanticTags.personNameComponents.phoneticRepresentation` | [#107](https://github.com/njausteve/ex_pass/issues/107) |
 | 62 | ✅ | `Pass.SemanticTags.Seat` | `Pass.semanticTags.seat.seatDescription` | [#109](https://github.com/njausteve/ex_pass/issues/109) |
-| 63 | `todo` |  | `Pass.semanticTags.seat.seatIdentifier` | [#110](https://github.com/njausteve/ex_pass/issues/110) |
-| 64 | `todo` |  | `Pass.semanticTags.seat.seatNumber` | [#111](https://github.com/njausteve/ex_pass/issues/111) |
-| 65 | `todo` |  | `Pass.semanticTags.seat.seatRow` | [#112](https://github.com/njausteve/ex_pass/issues/112) |
-| 66 | `todo` |  | `Pass.semanticTags.seat.seatSection` | [#113](https://github.com/njausteve/ex_pass/issues/113) |
+| 63 | ✅ |  | `Pass.semanticTags.seat.seatIdentifier` | [#110](https://github.com/njausteve/ex_pass/issues/110) |
+| 64 | ✅ |  | `Pass.semanticTags.seat.seatNumber` | [#111](https://github.com/njausteve/ex_pass/issues/111) |
+| 65 | ✅ |  | `Pass.semanticTags.seat.seatRow` | [#112](https://github.com/njausteve/ex_pass/issues/112) |
+| 66 | ✅ |  | `Pass.semanticTags.seat.seatSection` | [#113](https://github.com/njausteve/ex_pass/issues/113) |
 | 67 | `todo` | `Pass.SemanticTags.WifiNetwork` | `Pass.semanticTags.wifiNetwork.password` |  |
 | 68 | `todo` |  | `Pass.semanticTags.wifiNetwork.ssid` |  |
 | 69 | `todo` | `Pass.SemanticTags` | `Pass.semanticTags.airlineCode` | [#21](https://github.com/njausteve/ex_pass/issues/21) |
