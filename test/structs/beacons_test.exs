@@ -166,7 +166,7 @@ defmodule ExPass.Structs.BeaconsTest do
         relevant_text: 123
       }
 
-      assert_raise ArgumentError, "relevant_text must be a string if provided", fn ->
+      assert_raise ArgumentError, "relevant_text must be a non-empty string if provided", fn ->
         Beacons.new(params)
       end
     end

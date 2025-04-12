@@ -40,16 +40,17 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
     test "returns error for non-string seat_type" do
       params = %{seat_type: 123}
 
-      assert_raise ArgumentError, "seat_type must be a string if provided", fn ->
+      assert_raise ArgumentError, "seat_type must be a non-empty string if provided", fn ->
         Seat.new(params)
       end
     end
 
-    test "allows empty string for seat_type" do
+    test "does not allow empty string for seat_type" do
       params = %{seat_type: ""}
 
-      assert %Seat{} = seat = Seat.new(params)
-      assert seat.seat_type == ""
+      assert_raise ArgumentError, "seat_type must be a non-empty string if provided", fn ->
+        Seat.new(params)
+      end
     end
   end
 
@@ -82,16 +83,17 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
     test "returns error for non-string seat_description" do
       params = %{seat_description: 123}
 
-      assert_raise ArgumentError, "seat_description must be a string if provided", fn ->
+      assert_raise ArgumentError, "seat_description must be a non-empty string if provided", fn ->
         Seat.new(params)
       end
     end
 
-    test "allows empty string for seat_description" do
+    test "does not allow empty string for seat_description" do
       params = %{seat_description: ""}
 
-      assert %Seat{} = seat = Seat.new(params)
-      assert seat.seat_description == ""
+      assert_raise ArgumentError, "seat_description must be a non-empty string if provided", fn ->
+        Seat.new(params)
+      end
     end
   end
 
@@ -124,16 +126,17 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
     test "returns error for non-string seat_identifier" do
       params = %{seat_identifier: 123}
 
-      assert_raise ArgumentError, "seat_identifier must be a string if provided", fn ->
+      assert_raise ArgumentError, "seat_identifier must be a non-empty string if provided", fn ->
         Seat.new(params)
       end
     end
 
-    test "allows empty string for seat_identifier" do
+    test "does not allow empty string for seat_identifier" do
       params = %{seat_identifier: ""}
 
-      assert %Seat{} = seat = Seat.new(params)
-      assert seat.seat_identifier == ""
+      assert_raise ArgumentError, "seat_identifier must be a non-empty string if provided", fn ->
+        Seat.new(params)
+      end
     end
   end
 
@@ -166,16 +169,17 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
     test "returns error for non-string seat_number" do
       params = %{seat_number: 123}
 
-      assert_raise ArgumentError, "seat_number must be a string if provided", fn ->
+      assert_raise ArgumentError, "seat_number must be a non-empty string if provided", fn ->
         Seat.new(params)
       end
     end
 
-    test "allows empty string for seat_number" do
+    test "does not allow empty string for seat_number" do
       params = %{seat_number: ""}
 
-      assert %Seat{} = seat = Seat.new(params)
-      assert seat.seat_number == ""
+      assert_raise ArgumentError, "seat_number must be a non-empty string if provided", fn ->
+        Seat.new(params)
+      end
     end
   end
 
@@ -208,16 +212,17 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
     test "returns error for non-string seat_row" do
       params = %{seat_row: 123}
 
-      assert_raise ArgumentError, "seat_row must be a string if provided", fn ->
+      assert_raise ArgumentError, "seat_row must be a non-empty string if provided", fn ->
         Seat.new(params)
       end
     end
 
-    test "allows empty string for seat_row" do
+    test "does not allow empty string for seat_row" do
       params = %{seat_row: ""}
 
-      assert %Seat{} = seat = Seat.new(params)
-      assert seat.seat_row == ""
+      assert_raise ArgumentError, "seat_row must be a non-empty string if provided", fn ->
+        Seat.new(params)
+      end
     end
   end
 
@@ -250,16 +255,17 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
     test "returns error for non-string seat_section" do
       params = %{seat_section: 123}
 
-      assert_raise ArgumentError, "seat_section must be a string if provided", fn ->
+      assert_raise ArgumentError, "seat_section must be a non-empty string if provided", fn ->
         Seat.new(params)
       end
     end
 
-    test "allows empty string for seat_section" do
+    test "does not allow empty string for seat_section" do
       params = %{seat_section: ""}
 
-      assert %Seat{} = seat = Seat.new(params)
-      assert seat.seat_section == ""
+      assert_raise ArgumentError, "seat_section must be a non-empty string if provided", fn ->
+        Seat.new(params)
+      end
     end
   end
 end

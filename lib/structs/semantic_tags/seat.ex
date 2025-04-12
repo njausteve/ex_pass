@@ -56,7 +56,7 @@ defmodule ExPass.Structs.SemanticTags.Seat do
       %Seat{seat_type: "Reserved seating", seat_description: "A push back seat", seat_identifier: "Aisle 12, Row 3, Seat 5", seat_number: "3E", seat_row: "3", seat_section: "Aisle 12"}
 
       iex> Seat.new(%{seat_type: 123})
-      ** (ArgumentError) seat_type must be a string if provided
+      ** (ArgumentError) seat_type must be a non-empty string if provided
 
   """
   @spec new(map()) :: %__MODULE__{}

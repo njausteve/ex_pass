@@ -62,7 +62,7 @@ defmodule ExPass.Structs.BarcodesTest do
     end
 
     test "raises ArgumentError when alt_text is not a string" do
-      assert_raise ArgumentError, "alt_text must be a string if provided", fn ->
+      assert_raise ArgumentError, "alt_text must be a non-empty string if provided", fn ->
         Barcodes.new(%{
           alt_text: 123,
           format: "PKBarcodeFormatQR",

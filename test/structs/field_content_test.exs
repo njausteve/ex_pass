@@ -519,19 +519,15 @@ defmodule ExPass.Structs.FieldContentTest do
     end
 
     test "new/1 raises ArgumentError when label is not a string" do
-      assert_raise ArgumentError, ~r/label must be a string/, fn ->
+      assert_raise ArgumentError, "label must be a non-empty string if provided", fn ->
         FieldContent.new(%{key: "test_key", value: "test_value", label: 123})
       end
     end
 
-    test "new/1 allows an empty string for label" do
-      result = FieldContent.new(%{key: "test_key", value: "test_value", label: ""})
-
-      assert %FieldContent{key: "test_key", value: "test_value", label: ""} = result
-      encoded = Jason.encode!(result)
-      assert encoded =~ ~s("key":"test_key")
-      assert encoded =~ ~s("value":"test_value")
-      assert encoded =~ ~s("label":"")
+    test "new/1 does not allows an empty string for label" do
+      assert_raise ArgumentError, "label must be a non-empty string if provided", fn ->
+        FieldContent.new(%{key: "test_key", value: "test_value", label: ""})
+      end
     end
   end
 

@@ -246,16 +246,17 @@ defmodule ExPass.Structs.LocationsTest do
     test "returns error for non-string relevantText" do
       params = %{latitude: 37.7749, longitude: -122.4194, relevant_text: 123}
 
-      assert_raise ArgumentError, "relevant_text must be a string if provided", fn ->
+      assert_raise ArgumentError, "relevant_text must be a non-empty string if provided", fn ->
         Locations.new(params)
       end
     end
 
-    test "allows empty string for relevantText" do
+    test "does not allow empty string for relevantText" do
       params = %{latitude: 37.7749, longitude: -122.4194, relevant_text: ""}
 
-      assert %Locations{} = location = Locations.new(params)
-      assert location.relevant_text == ""
+      assert_raise ArgumentError, "relevant_text must be a non-empty string if provided", fn ->
+        Locations.new(params)
+      end
     end
   end
 end
