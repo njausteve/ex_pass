@@ -94,4 +94,172 @@ defmodule ExPass.Structs.SemanticTags.SeatTest do
       assert seat.seat_description == ""
     end
   end
+
+  describe "new/1 with seat_identifier" do
+    test "creates a valid Seat struct with seat_identifier" do
+      params = %{seat_identifier: "Aisle 12, Row 3, Seat 5"}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_identifier == "Aisle 12, Row 3, Seat 5"
+
+      encoded = Jason.encode!(seat)
+      assert encoded =~ ~s("seatIdentifier":"Aisle 12, Row 3, Seat 5")
+    end
+
+    test "creates a valid Seat struct without seat_identifier" do
+      assert %Seat{} = seat = Seat.new(%{})
+      refute seat.seat_identifier
+
+      encoded = Jason.encode!(seat)
+      refute encoded =~ "seatIdentifier"
+    end
+
+    test "trims whitespace from seat_identifier" do
+      params = %{seat_identifier: "  Aisle 12, Row 3, Seat 5  "}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_identifier == "Aisle 12, Row 3, Seat 5"
+    end
+
+    test "returns error for non-string seat_identifier" do
+      params = %{seat_identifier: 123}
+
+      assert_raise ArgumentError, "seat_identifier must be a string if provided", fn ->
+        Seat.new(params)
+      end
+    end
+
+    test "allows empty string for seat_identifier" do
+      params = %{seat_identifier: ""}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_identifier == ""
+    end
+  end
+
+  describe "new/1 with seat_number" do
+    test "creates a valid Seat struct with seat_number" do
+      params = %{seat_number: "3E"}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_number == "3E"
+
+      encoded = Jason.encode!(seat)
+      assert encoded =~ ~s("seatNumber":"3E")
+    end
+
+    test "creates a valid Seat struct without seat_number" do
+      assert %Seat{} = seat = Seat.new(%{})
+      refute seat.seat_number
+
+      encoded = Jason.encode!(seat)
+      refute encoded =~ "seatNumber"
+    end
+
+    test "trims whitespace from seat_number" do
+      params = %{seat_number: "  3E  "}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_number == "3E"
+    end
+
+    test "returns error for non-string seat_number" do
+      params = %{seat_number: 123}
+
+      assert_raise ArgumentError, "seat_number must be a string if provided", fn ->
+        Seat.new(params)
+      end
+    end
+
+    test "allows empty string for seat_number" do
+      params = %{seat_number: ""}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_number == ""
+    end
+  end
+
+  describe "new/1 with seat_row" do
+    test "creates a valid Seat struct with seat_row" do
+      params = %{seat_row: "3"}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_row == "3"
+
+      encoded = Jason.encode!(seat)
+      assert encoded =~ ~s("seatRow":"3")
+    end
+
+    test "creates a valid Seat struct without seat_row" do
+      assert %Seat{} = seat = Seat.new(%{})
+      refute seat.seat_row
+
+      encoded = Jason.encode!(seat)
+      refute encoded =~ "seatRow"
+    end
+
+    test "trims whitespace from seat_row" do
+      params = %{seat_row: "  3  "}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_row == "3"
+    end
+
+    test "returns error for non-string seat_row" do
+      params = %{seat_row: 123}
+
+      assert_raise ArgumentError, "seat_row must be a string if provided", fn ->
+        Seat.new(params)
+      end
+    end
+
+    test "allows empty string for seat_row" do
+      params = %{seat_row: ""}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_row == ""
+    end
+  end
+
+  describe "new/1 with seat_section" do
+    test "creates a valid Seat struct with seat_section" do
+      params = %{seat_section: "Aisle 12"}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_section == "Aisle 12"
+
+      encoded = Jason.encode!(seat)
+      assert encoded =~ ~s("seatSection":"Aisle 12")
+    end
+
+    test "creates a valid Seat struct without seat_section" do
+      assert %Seat{} = seat = Seat.new(%{})
+      refute seat.seat_section
+
+      encoded = Jason.encode!(seat)
+      refute encoded =~ "seat_section"
+    end
+
+    test "trims whitespace from seat_section" do
+      params = %{seat_section: "  Aisle 12  "}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_section == "Aisle 12"
+    end
+
+    test "returns error for non-string seat_section" do
+      params = %{seat_section: 123}
+
+      assert_raise ArgumentError, "seat_section must be a string if provided", fn ->
+        Seat.new(params)
+      end
+    end
+
+    test "allows empty string for seat_section" do
+      params = %{seat_section: ""}
+
+      assert %Seat{} = seat = Seat.new(params)
+      assert seat.seat_section == ""
+    end
+  end
 end
