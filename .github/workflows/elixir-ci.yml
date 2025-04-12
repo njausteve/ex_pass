@@ -11,6 +11,9 @@ env:
 
 permissions:
   contents: read
+  pull-requests: write
+  id-token: write
+  checks: write
 
 jobs:
   test:
@@ -88,5 +91,25 @@ jobs:
         run: mix format --check-formatted
         if: ${{ matrix.lint }}
 
-      - name: Run tests
+      - name: Run tests with coverage
+        run: mix coveralls.cobertura
+        if: ${{ matrix.elixir == '1.17' }}
+
+      - name: Run tests without coverage
         run: mix test
+        if: ${{ matrix.elixir != '1.17' }}
+
+      - name: Report Coverage
+        uses: 5monkeys/cobertura-action@master
+        if: ${{ matrix.elixir == '1.17' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' }}
+        with:
+          path: cover/cobertura.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 97.56
+          fail_below_threshold: true
+          show_line: true
+          show_branch: true
+          show_class_names: true
+          show_missing: true
+          link_missing_lines: true
+          only_changed_files: true

@@ -9,7 +9,14 @@ defmodule ExPass.MixProject do
       config_path: "./config/config.exs",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      test_coverage: [threshold: 97.56]
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.cobertura": :test
+      ]
     ]
   end
 
@@ -23,10 +30,11 @@ defmodule ExPass.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:typedstruct, "~> 0.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:typedstruct, "~> 0.5"}
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 end
