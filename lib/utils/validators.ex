@@ -618,7 +618,7 @@ defmodule ExPass.Utils.Validators do
       {:error, "label must be a non-empty string if provided"}
 
       iex> validate_optional_string(123, :label)
-      {:error, "label must be a string if provided"}
+      {:error, "label must be a non-empty string if provided"}
 
   """
   @spec validate_optional_string(String.t() | nil, atom()) :: :ok | {:error, String.t()}
