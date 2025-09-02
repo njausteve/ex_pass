@@ -48,7 +48,7 @@ end
 | 28 | ✅ |  | `Pass.nfc.message` | [#94](https://github.com/njausteve/ex_pass/issues/94) |
 | 29 | ✅ |  | `Pass.nfc.requiresAuthentication` | [#95](https://github.com/njausteve/ex_pass/issues/95) |
 | 30 | `todo` | `Pass.PassFields.AuxiliaryFields` | Inherits From `Pass.PassFieldContent` |  |
-| 31 | `todo` |  | `Pass.PassFields.AuxiliaryFields.row` | [#64](https://github.com/njausteve/ex_pass/issues/64) |
+| 31 | ✅ |  | `Pass.PassFields.AuxiliaryFields.row` | [#64](https://github.com/njausteve/ex_pass/issues/64) |
 | 32 | `todo` | `Pass.PassFields.SecondaryFields` | Inherits From `Pass.PassFieldContent` | [#69](https://github.com/njausteve/ex_pass/issues/69) |
 | 33 | `todo` | `Pass.PassFields.PrimaryFields` | Inherits From `Pass.PassFieldContent` | [#68](https://github.com/njausteve/ex_pass/issues/68) |
 | 34 | `todo` | `Pass.PassFields.HeaderFields` | Inherits From `Pass.PassFieldContent` | [#67](https://github.com/njausteve/ex_pass/issues/67) |
