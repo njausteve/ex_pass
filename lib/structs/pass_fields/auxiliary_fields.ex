@@ -85,7 +85,7 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFields do
   def new(attrs \\ %{}) do
     # Set default for row if not provided
     attrs = Map.put_new(attrs, :row, 0)
-    
+
     attrs =
       attrs
       |> Converter.trim_string_values()
@@ -110,6 +110,7 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFields do
   @spec validate_row(any()) :: :ok | {:error, String.t()}
   defp validate_row(value) when value in [0, 1], do: :ok
   defp validate_row(nil), do: :ok
+
   defp validate_row(_value) do
     {:error, "row must be 0 or 1"}
   end

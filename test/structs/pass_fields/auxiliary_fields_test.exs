@@ -15,33 +15,34 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFieldsTest do
 
     test "creates a new AuxiliaryFields with minimum required fields" do
       auxiliary_field = AuxiliaryFields.new(%{key: "aux_key", value: "aux_value"})
-      
+
       assert %AuxiliaryFields{
-        key: "aux_key",
-        value: "aux_value",
-        row: 0
-      } = auxiliary_field
+               key: "aux_key",
+               value: "aux_value",
+               row: 0
+             } = auxiliary_field
     end
 
     test "creates AuxiliaryFields with all inherited FieldContent fields" do
       datetime = ~U[2023-04-15 14:30:00Z]
-      
-      auxiliary_field = AuxiliaryFields.new(%{
-        key: "aux_key",
-        value: datetime,
-        attributed_value: "Attributed",
-        change_message: "Changed to %@",
-        currency_code: "USD",
-        data_detector_types: ["PKDataDetectorTypePhoneNumber"],
-        date_style: "PKDateStyleShort",
-        ignores_time_zone: true,
-        is_relative: false,
-        label: "Auxiliary Label",
-        number_style: "PKNumberStyleDecimal",
-        text_alignment: "PKTextAlignmentCenter",
-        time_style: "PKDateStyleMedium"
-      })
-      
+
+      auxiliary_field =
+        AuxiliaryFields.new(%{
+          key: "aux_key",
+          value: datetime,
+          attributed_value: "Attributed",
+          change_message: "Changed to %@",
+          currency_code: "USD",
+          data_detector_types: ["PKDataDetectorTypePhoneNumber"],
+          date_style: "PKDateStyleShort",
+          ignores_time_zone: true,
+          is_relative: false,
+          label: "Auxiliary Label",
+          number_style: "PKNumberStyleDecimal",
+          text_alignment: "PKTextAlignmentCenter",
+          time_style: "PKDateStyleMedium"
+        })
+
       assert auxiliary_field.key == "aux_key"
       assert auxiliary_field.value == datetime
       assert auxiliary_field.attributed_value == "Attributed"
@@ -90,12 +91,13 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFieldsTest do
     end
 
     test "trims whitespace from string fields" do
-      auxiliary_field = AuxiliaryFields.new(%{
-        key: "  test_key  ",
-        value: "  test_value  ",
-        label: "  label  "
-      })
-      
+      auxiliary_field =
+        AuxiliaryFields.new(%{
+          key: "  test_key  ",
+          value: "  test_value  ",
+          label: "  label  "
+        })
+
       assert auxiliary_field.key == "test_key"
       assert auxiliary_field.value == "test_value"
       assert auxiliary_field.label == "label"
@@ -104,13 +106,14 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFieldsTest do
 
   describe "JSON encoding" do
     test "encodes AuxiliaryFields to JSON with camelCase keys" do
-      auxiliary_field = AuxiliaryFields.new(%{
-        key: "aux_key",
-        value: "aux_value",
-        label: "Auxiliary",
-        row: 1
-      })
-      
+      auxiliary_field =
+        AuxiliaryFields.new(%{
+          key: "aux_key",
+          value: "aux_value",
+          label: "Auxiliary",
+          row: 1
+        })
+
       encoded = Jason.encode!(auxiliary_field)
       assert encoded =~ ~s("key":"aux_key")
       assert encoded =~ ~s("value":"aux_value")
@@ -119,11 +122,12 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFieldsTest do
     end
 
     test "encodes AuxiliaryFields with default row value" do
-      auxiliary_field = AuxiliaryFields.new(%{
-        key: "aux_key",
-        value: "aux_value"
-      })
-      
+      auxiliary_field =
+        AuxiliaryFields.new(%{
+          key: "aux_key",
+          value: "aux_value"
+        })
+
       encoded = Jason.encode!(auxiliary_field)
       assert encoded =~ ~s("key":"aux_key")
       assert encoded =~ ~s("value":"aux_value")
@@ -131,19 +135,20 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFieldsTest do
     end
 
     test "omits nil fields from JSON output" do
-      auxiliary_field = AuxiliaryFields.new(%{
-        key: "aux_key",
-        value: "aux_value",
-        row: 1
-      })
-      
+      auxiliary_field =
+        AuxiliaryFields.new(%{
+          key: "aux_key",
+          value: "aux_value",
+          row: 1
+        })
+
       encoded = Jason.encode!(auxiliary_field)
-      
+
       # Required fields and non-nil fields should be present
       assert encoded =~ ~s("key":"aux_key")
       assert encoded =~ ~s("value":"aux_value")
       assert encoded =~ ~s("row":1)
-      
+
       # Nil fields should not be present
       refute encoded =~ ~s("attributedValue")
       refute encoded =~ ~s("changeMessage")
@@ -190,12 +195,13 @@ defmodule ExPass.Structs.PassFields.AuxiliaryFieldsTest do
     end
 
     test "accepts valid change_message with '%@' placeholder" do
-      auxiliary_field = AuxiliaryFields.new(%{
-        key: "test",
-        value: "test",
-        change_message: "Value changed to %@"
-      })
-      
+      auxiliary_field =
+        AuxiliaryFields.new(%{
+          key: "test",
+          value: "test",
+          change_message: "Value changed to %@"
+        })
+
       assert auxiliary_field.change_message == "Value changed to %@"
     end
   end
