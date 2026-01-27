@@ -8,9 +8,11 @@ defmodule ExPass.Structs.SemanticTags.CurrencyAmountTest do
 
   describe "new/0" do
     test "raises an error when called without arguments" do
-      assert_raise ArgumentError, "amount is a required field and must be a non-empty string", fn ->
-        CurrencyAmount.new()
-      end
+      assert_raise ArgumentError,
+                   "amount is a required field and must be a non-empty string",
+                   fn ->
+                     CurrencyAmount.new()
+                   end
     end
   end
 
@@ -34,9 +36,11 @@ defmodule ExPass.Structs.SemanticTags.CurrencyAmountTest do
     end
 
     test "raises an error for missing amount" do
-      assert_raise ArgumentError, "amount is a required field and must be a non-empty string", fn ->
-        CurrencyAmount.new(%{currency_code: "USD"})
-      end
+      assert_raise ArgumentError,
+                   "amount is a required field and must be a non-empty string",
+                   fn ->
+                     CurrencyAmount.new(%{currency_code: "USD"})
+                   end
     end
 
     test "raises an error for missing currency_code" do
@@ -64,21 +68,27 @@ defmodule ExPass.Structs.SemanticTags.CurrencyAmountTest do
     end
 
     test "raises an error for empty amount" do
-      assert_raise ArgumentError, "amount is a required field and must be a non-empty string", fn ->
-        CurrencyAmount.new(%{amount: "", currency_code: "USD"})
-      end
+      assert_raise ArgumentError,
+                   "amount is a required field and must be a non-empty string",
+                   fn ->
+                     CurrencyAmount.new(%{amount: "", currency_code: "USD"})
+                   end
     end
 
     test "raises an error for non-string amount" do
-      assert_raise ArgumentError, "amount is a required field and must be a non-empty string", fn ->
-        CurrencyAmount.new(%{amount: 10.00, currency_code: "USD"})
-      end
+      assert_raise ArgumentError,
+                   "amount is a required field and must be a non-empty string",
+                   fn ->
+                     CurrencyAmount.new(%{amount: 10.00, currency_code: "USD"})
+                   end
     end
 
     test "raises an error for nil amount" do
-      assert_raise ArgumentError, "amount is a required field and must be a non-empty string", fn ->
-        CurrencyAmount.new(%{amount: nil, currency_code: "USD"})
-      end
+      assert_raise ArgumentError,
+                   "amount is a required field and must be a non-empty string",
+                   fn ->
+                     CurrencyAmount.new(%{amount: nil, currency_code: "USD"})
+                   end
     end
   end
 
