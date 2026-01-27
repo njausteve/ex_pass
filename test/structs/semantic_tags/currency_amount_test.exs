@@ -126,6 +126,18 @@ defmodule ExPass.Structs.SemanticTags.CurrencyAmountTest do
         CurrencyAmount.new(%{amount: "10.00", currency_code: nil})
       end
     end
+
+    test "raises an error for empty currency_code" do
+      assert_raise ArgumentError, "currency_code is required", fn ->
+        CurrencyAmount.new(%{amount: "10.00", currency_code: ""})
+      end
+    end
+
+    test "raises an error for whitespace-only currency_code" do
+      assert_raise ArgumentError, "currency_code is required", fn ->
+        CurrencyAmount.new(%{amount: "10.00", currency_code: "   "})
+      end
+    end
   end
 
   describe "JSON encoding" do

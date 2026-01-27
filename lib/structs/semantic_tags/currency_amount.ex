@@ -95,6 +95,10 @@ defmodule ExPass.Structs.SemanticTags.CurrencyAmount do
     {:error, "currency_code is required"}
   end
 
+  defp validate_required_currency_code("") do
+    {:error, "currency_code is required"}
+  end
+
   defp validate_required_currency_code(value) do
     Validators.validate_currency_code(value)
   end
