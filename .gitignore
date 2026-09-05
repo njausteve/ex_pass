@@ -34,3 +34,14 @@ ex_pass-*.tar
 # Ignore Elixir Language Server files
 .elixir_ls/
 .qodo
+
+# graph-fleet's own artifacts: the repo contract, the code graph and ontology,
+# and each run's evidence and narration. All derived from this repository and
+# rebuilt by `graph-bootstrap` / `index_repo.py` / `ontology project`, so they
+# are machine-local rather than part of the library.
+/.graph/
+/.graph-fleet/
+/.graph-runs/
+
+# Agent tooling that is per-checkout, not per-project.
+/.claude/
