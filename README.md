@@ -51,7 +51,7 @@ end
 | 31 | ✅ |  | `Pass.PassFields.AuxiliaryFields.row` | [#64](https://github.com/njausteve/ex_pass/issues/64) |
 | 32 | `todo` | `Pass.PassFields.SecondaryFields` | Inherits From `Pass.PassFieldContent` | [#69](https://github.com/njausteve/ex_pass/issues/69) |
 | 33 | `todo` | `Pass.PassFields.PrimaryFields` | Inherits From `Pass.PassFieldContent` | [#68](https://github.com/njausteve/ex_pass/issues/68) |
-| 34 | `todo` | `Pass.PassFields.HeaderFields` | Inherits From `Pass.PassFieldContent` | [#67](https://github.com/njausteve/ex_pass/issues/67) |
+| 34 | ✅ | `Pass.PassFields.HeaderFields` | Inherits From `Pass.PassFieldContent` | [#67](https://github.com/njausteve/ex_pass/issues/67) |
 | 35 | `todo` | `Pass.PassFields.BackFields` | Inherits From `Pass.PassFieldContent` | [#66](https://github.com/njausteve/ex_pass/issues/66) |
 | 36 | `todo` | `Pass.PassFields` | `Pass.PassFields.auxiliaryFields` | [#139](https://github.com/njausteve/ex_pass/issues/139) |
 | 37 | `todo` |  | `Pass.PassFields.backFields` | [#140](https://github.com/njausteve/ex_pass/issues/140) |
