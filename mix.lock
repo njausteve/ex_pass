@@ -6,5 +6,5 @@
   "jason": {:hex, :jason, "1.4.5", "2e3a008590b0b8d7388c20293e9dcc9cf3e5d642fd2a114e4cbbb52e595d940a", [:mix], [{:decimal, "~> 1.0 or ~> 2.0 or ~> 3.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "b0c823996102bcd0239b3c2444eb00409b72f6a140c1950bc8b457d836b30684"},
   "mix_test_watch": {:hex, :mix_test_watch, "1.2.0", "1f9acd9e1104f62f280e30fc2243ae5e6d8ddc2f7f4dc9bceb454b9a41c82b42", [:mix], [{:file_system, "~> 0.2 or ~> 1.0", [hex: :file_system, repo: "hexpm", optional: false]}], "hexpm", "278dc955c20b3fb9a3168b5c2493c2e5cffad133548d307e0a50c7f2cfbf34f6"},
   "sobelow": {:hex, :sobelow, "0.18.1", "a8f175c6f2ba87fb7be536742b07cb1e6bc9297305a237f383b63c05ff55582b", [:mix], [{:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm", "57247d54ad77477bed63c72239ddfdb6e94d09261323de0101f9a8bcc0247c82"},
-  "typedstruct": {:hex, :typedstruct, "0.5.3", "d68ae424251a41b81a8d0c485328ab48edbd3858f3565bbdac21b43c056fc9b4", [:make, :mix], [], "hexpm", "b53b8186701417c0b2782bf02a2db5524f879b8488f91d1d83b97d84c2943432"},
+  "typedstruct": {:hex, :typedstruct, "0.6.2", "271a701157735f79f1042622c86d8589c59ee5892ea073a1936aa470890d75d5", [:mix], [], "hexpm", "d222d87c6e46a047ad39190b0a05a0b917ba83ca40c871ae38bbe84e2e829574"},
 }
